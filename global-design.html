@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>整体设计 · 安心家</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <style>
+    .render-stage {
+      flex: 1;
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #F5E5D3 0%, #E8C9A8 50%, #D8AB7E 100%);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .render-skeleton {
+      width: 80%;
+      height: 70%;
+      border-radius: 12px;
+      background: linear-gradient(110deg, rgba(255,255,255,0.3) 30%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.3) 70%);
+      background-size: 200% 100%;
+      animation: shimmer 1.6s infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-deep);
+      font-weight: 600;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .render-result {
+      width: 90%;
+      height: 86%;
+      border-radius: 14px;
+      box-shadow: var(--shadow-pop);
+      position: relative;
+      overflow: hidden;
+      background: #FBF3EA;
+    }
+    .room-illustrations {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 4px;
+      padding: 4px;
+      background: var(--color-deep);
+    }
+    .mini-room {
+      position: relative;
+      overflow: hidden;
+    }
+    .mini-room.living { background: linear-gradient(160deg, #F5DCC0 0%, #E8C09A 100%); grid-column: span 2; }
+    .mini-room.master { background: linear-gradient(160deg, #E8DCC8 0%, #C9B498 100%); }
+    .mini-room.kid { background: linear-gradient(160deg, #FCE3D5 0%, #F2B89B 100%); }
+    .mini-room.kitchen { background: linear-gradient(160deg, #FFF1D2 0%, #F2D89A 100%); }
+    .mini-room.bath { background: linear-gradient(160deg, #DDE8F0 0%, #B8CDD9 100%); }
+
+    .mini-room .label {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background: rgba(255,255,255,0.85);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-deep);
+    }
+    .mini-room .deco {
+      position: absolute;
+      font-size: 36px;
+      opacity: 0.7;
+    }
+
+    .render-overlay-tip {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      background: rgba(255, 255, 255, 0.92);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-card);
+    }
+    .render-overlay-actions {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .style-section {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--color-line);
+    }
+    .style-section h4 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      color: var(--color-deep);
+      font-weight: 600;
+    }
+    .budget-pills {
+      display: flex;
+      gap: 6px;
+    }
+    .budget-pill {
+      flex: 1;
+      padding: 8px 0;
+      text-align: center;
+      border: 1.5px solid var(--color-line);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: 0.15s;
+    }
+    .budget-pill.selected {
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+    .budget-pill:hover:not(.selected) { border-color: var(--color-primary); }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div id="topbar"></div>
+    <div id="progress"></div>
+
+    <div class="workspace">
+      <!-- Canvas -->
+      <div class="canvas-pane">
+        <div class="canvas-toolbar">
+          <div class="toolbar-group">
+            <button>2D 平面图</button>
+            <button class="active">3D 渲染</button>
+            <button>360° 全景</button>
+          </div>
+          <div class="toolbar-group">
+            <button>☀️ 白天</button>
+            <button>🌆 黄昏</button>
+            <button>🌙 夜晚</button>
+          </div>
+          <div style="margin-left:auto;" class="tiny muted">⏱️ 方案 v1 · 生成于 2 分钟前</div>
+        </div>
+
+        <div class="render-stage" id="render-stage">
+          <div class="render-result">
+            <div class="render-overlay-tip">
+              <span>🌟</span>
+              <span><b>奶油风</b> · 暖色基调 · 舒适档</span>
+            </div>
+
+            <div class="room-illustrations">
+              <div class="mini-room living">
+                <span class="deco" style="top:20%;left:15%;">🛋️</span>
+                <span class="deco" style="top:35%;right:20%;font-size:28px;">🪴</span>
+                <span class="deco" style="bottom:25%;left:30%;font-size:28px;">📺</span>
+                <span class="label">客厅 · 22㎡</span>
+              </div>
+              <div class="mini-room master">
+                <span class="deco" style="top:25%;left:30%;">🛏️</span>
+                <span class="deco" style="bottom:30%;right:15%;font-size:28px;">🪟</span>
+                <span class="label">主卧 · 12.5㎡</span>
+              </div>
+              <div class="mini-room kid">
+                <span class="deco" style="top:20%;left:20%;font-size:32px;">🧸</span>
+                <span class="deco" style="bottom:25%;right:20%;font-size:28px;">📚</span>
+                <span class="label">儿童房 · 9.5㎡</span>
+              </div>
+              <div class="mini-room kitchen">
+                <span class="deco" style="top:25%;left:25%;font-size:30px;">🍳</span>
+                <span class="deco" style="bottom:25%;right:20%;font-size:26px;">🍽️</span>
+                <span class="label">厨房+餐厅</span>
+              </div>
+              <div class="mini-room bath">
+                <span class="deco" style="top:25%;left:30%;font-size:30px;">🛁</span>
+                <span class="label">卫生间</span>
+              </div>
+            </div>
+
+            <div class="render-overlay-actions">
+              <button class="btn btn-ghost btn-sm" style="background:rgba(255,255,255,0.92);">🔄 重新生成</button>
+              <a href="refinement.html" class="btn btn-primary btn-sm">进入局部微调 →</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="legend">
+          <span>💡 你可以在右侧切换风格 / 颜色,我会重新生成方案。</span>
+        </div>
+      </div>
+
+      <!-- Chat -->
+      <aside class="chat-pane">
+        <div class="chat-header">
+          <span class="live-dot"></span>
+          <span>AI 助手 · 整体设计</span>
+        </div>
+
+        <div class="chat-stream" id="chat" style="max-height:280px;"></div>
+
+        <!-- Style + sliders panels (always visible) -->
+        <div style="border-top:1px solid var(--color-line);overflow-y:auto;">
+          <div class="style-section">
+            <h4>🎨 整体风格</h4>
+            <div class="style-grid" id="style-grid">
+              <div class="style-card" data-style="现代简约">
+                <div class="thumb" style="background:linear-gradient(135deg,#E8E2DA,#C9C0B5);">⬜</div>
+                <div class="label">现代简约</div>
+              </div>
+              <div class="style-card" data-style="北欧">
+                <div class="thumb" style="background:linear-gradient(135deg,#F5F0E8,#D8C8B0);">🌿</div>
+                <div class="label">北欧</div>
+              </div>
+              <div class="style-card selected" data-style="奶油">
+                <div class="thumb" style="background:linear-gradient(135deg,#FCE3D5,#F2C8A0);">🍦</div>
+                <div class="label">奶油</div>
+              </div>
+              <div class="style-card" data-style="日式">
+                <div class="thumb" style="background:linear-gradient(135deg,#EFE5D5,#C9A878);">🎋</div>
+                <div class="label">日式</div>
+              </div>
+              <div class="style-card" data-style="新中式">
+                <div class="thumb" style="background:linear-gradient(135deg,#D8B898,#A87A52);">🏮</div>
+                <div class="label">新中式</div>
+              </div>
+              <div class="style-card" data-style="复古">
+                <div class="thumb" style="background:linear-gradient(135deg,#A87A6F,#6E4B45);">📻</div>
+                <div class="label">复古</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="style-section">
+            <h4>🌡️ 颜色基调</h4>
+            <div class="slider-row">
+              <label><span>暖</span><span>冷</span></label>
+              <input type="range" min="0" max="100" value="25">
+            </div>
+            <div class="slider-row">
+              <label><span>明亮</span><span>暗沉</span></label>
+              <input type="range" min="0" max="100" value="35">
+            </div>
+          </div>
+
+          <div class="style-section">
+            <h4>💰 预算档位</h4>
+            <div class="budget-pills">
+              <div class="budget-pill">经济</div>
+              <div class="budget-pill selected">舒适</div>
+              <div class="budget-pill">轻奢</div>
+            </div>
+            <p class="tiny muted" style="margin:10px 0 0;">舒适档:整装预算 18-30 万 · 软装单独占 30%</p>
+          </div>
+        </div>
+
+        <div class="chat-input">
+          <input id="chat-input" placeholder="描述具体想法,如「主卧要大柜子靠北墙」..." />
+          <button class="chat-send" id="chat-send">▶</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="js/shared.js"></script>
+  <script src="js/chat-script.js"></script>
+  <script>
+    document.getElementById('topbar').innerHTML = AnxinHome.renderTopbar('workspace');
+    document.getElementById('progress').innerHTML = AnxinHome.renderProgress('global');
+
+    const chat = document.getElementById('chat');
+    const script = window.AnxinChatScripts.global;
+    let idx = 0;
+
+    async function playNext() {
+      if (idx >= script.length) return;
+      const step = script[idx++];
+
+      if (step.role === 'ai') {
+        const typing = AnxinHome.appendBubble(chat, { role: 'ai', withTyping: true });
+        await AnxinHome.delay(step.withDelay || 700);
+        typing.remove();
+        AnxinHome.appendBubble(chat, { role: 'ai', html: step.text });
+        await AnxinHome.delay(300);
+        playNext();
+      } else if (step.role === 'system') {
+        AnxinHome.appendBubble(chat, { role: 'system', html: step.text });
+        await AnxinHome.delay(200);
+        playNext();
+      } else if (step.role === 'user') {
+        AnxinHome.appendBubble(chat, { role: 'user', html: step.text });
+        await AnxinHome.delay(200);
+        playNext();
+      } else if (step.role === 'styleCards') {
+        AnxinHome.appendBubble(chat, {
+          role: 'system',
+          html: '👇 请在下方面板选择喜欢的风格(已默认选中:奶油风)'
+        });
+        await AnxinHome.delay(800);
+        playNext();
+      } else if (step.role === 'sliders') {
+        AnxinHome.appendBubble(chat, {
+          role: 'system',
+          html: '👇 调整下方面板的颜色基调和预算'
+        });
+        await AnxinHome.delay(800);
+        playNext();
+      } else if (step.role === 'options') {
+        AnxinHome.appendOptions(chat, step.options, (opt) => {
+          AnxinHome.appendBubble(chat, { role: 'user', html: opt.label });
+          if (opt.goto) {
+            setTimeout(() => { window.location.href = opt.goto; }, 600);
+          } else {
+            setTimeout(playNext, 400);
+          }
+        });
+      }
+    }
+
+    setTimeout(playNext, 600);
+
+    // Style cards interaction
+    document.querySelectorAll('.style-card').forEach(card => {
+      card.onclick = () => {
+        document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        const style = card.dataset.style;
+        AnxinHome.toast({ type: 'info', title: '风格已切换', msg: `已切换为「${style}」,正在重新生成预览...`, duration: 3500 });
+      };
+    });
+
+    // Budget pills
+    document.querySelectorAll('.budget-pill').forEach(p => {
+      p.onclick = () => {
+        document.querySelectorAll('.budget-pill').forEach(x => x.classList.remove('selected'));
+        p.classList.add('selected');
+      };
+    });
+
+    // First-time tip
+    setTimeout(() => {
+      AnxinHome.toast({
+        type: 'warn',
+        title: '🌟 智能提醒',
+        msg: '检测到主卧朝北,自然光偏弱,建议加暖色辅助灯。',
+        duration: 8000,
+      });
+    }, 3500);
+
+    // Chat send
+    document.getElementById('chat-send').onclick = () => {
+      const v = document.getElementById('chat-input').value.trim();
+      if (!v) return;
+      AnxinHome.appendBubble(chat, { role: 'user', html: v });
+      document.getElementById('chat-input').value = '';
+      setTimeout(() => {
+        const typing = AnxinHome.appendBubble(chat, { role: 'ai', withTyping: true });
+        setTimeout(() => {
+          typing.remove();
+          AnxinHome.appendBubble(chat, { role: 'ai', html: '已记录到方案需求 ✅' });
+        }, 900);
+      }, 200);
+    };
+  </script>
+</body>
+</html>

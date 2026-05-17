@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>新建项目 · 安心家</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <style>
+    .new-project-wrap {
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 0 32px;
+    }
+    .stepper-card {
+      background: var(--color-surface);
+      border-radius: 20px;
+      padding: 40px 48px;
+      box-shadow: var(--shadow-card);
+    }
+    .step-content { display: none; animation: fadeStep 0.3s ease; }
+    .step-content.active { display: block; }
+    @keyframes fadeStep {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .choice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0 30px;
+    }
+    .choice-card {
+      border: 2px solid var(--color-line);
+      border-radius: 16px;
+      padding: 24px;
+      cursor: pointer;
+      transition: 0.2s;
+      background: var(--color-surface);
+    }
+    .choice-card:hover { border-color: var(--color-accent); }
+    .choice-card.selected {
+      border-color: var(--color-primary);
+      background: var(--color-primary-soft);
+    }
+    .choice-card .ico {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+    .choice-card .title {
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--color-deep);
+      margin-bottom: 6px;
+    }
+    .choice-card .desc {
+      font-size: 12px;
+      color: var(--color-mute);
+      line-height: 1.5;
+    }
+    .upload-zone {
+      border: 2px dashed var(--color-accent);
+      border-radius: 16px;
+      padding: 48px 24px;
+      text-align: center;
+      background: var(--color-surface-2);
+      cursor: pointer;
+      transition: 0.2s;
+      margin: 20px 0 12px;
+    }
+    .upload-zone:hover {
+      border-color: var(--color-primary);
+      background: var(--color-primary-soft);
+    }
+    .upload-zone.has-file {
+      border-style: solid;
+      border-color: var(--color-success);
+      background: var(--color-success-bg);
+    }
+    .demo-link {
+      text-align: center;
+      color: var(--color-primary);
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 500;
+      display: inline-block;
+    }
+    .demo-link:hover { text-decoration: underline; }
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div id="topbar"></div>
+
+    <div class="new-project-wrap">
+      <!-- Steps indicator -->
+      <div class="steps-indicator">
+        <div class="step-pill active" id="pill-1">
+          <div class="num">1</div>
+          <span>装修类型</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-pill" id="pill-2">
+          <div class="num">2</div>
+          <span>体验模式</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-pill" id="pill-3">
+          <div class="num">3</div>
+          <span>上传户型图</span>
+        </div>
+      </div>
+
+      <div class="stepper-card">
+        <!-- STEP 1 -->
+        <div class="step-content active" data-step="1">
+          <h2 style="margin:0 0 6px;color:var(--color-deep);font-size:22px;">你想做什么类型的装修?</h2>
+          <p class="muted" style="margin:0;">不同类型流程略有不同,选错了也能随时切换。</p>
+
+          <div class="choice-grid">
+            <div class="choice-card" data-value="full">
+              <div class="ico">🏠</div>
+              <div class="title">全屋装修</div>
+              <div class="desc">毛坯房 / 整套重装,从 0 到 1 出方案。AI 会陪你走完建模 → 整体设计 → 局部微调 → 成品 4 步。</div>
+            </div>
+            <div class="choice-card" data-value="partial">
+              <div class="ico">🛠️</div>
+              <div class="title">局部改造</div>
+              <div class="desc">某一间房翻新,如书房改儿童房、阳台改茶室。需要扫描房间现状或上传照片。</div>
+            </div>
+          </div>
+
+          <div class="nav-buttons">
+            <a href="index.html" class="btn btn-ghost">← 取消</a>
+            <button class="btn btn-primary" id="next-1" disabled style="opacity:0.5;">下一步 →</button>
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="step-content" data-step="2">
+          <h2 style="margin:0 0 6px;color:var(--color-deep);font-size:22px;">你更想要哪种体验?</h2>
+          <p class="muted" style="margin:0;">没经验也别紧张,小白模式会更多卡片引导。</p>
+
+          <div class="choice-grid">
+            <div class="choice-card selected" data-value="novice">
+              <div class="ico">🌱</div>
+              <div class="title">小白模式 <span class="tag tag-primary tiny" style="margin-left:6px;">推荐</span></div>
+              <div class="desc">AI 主动问问题、给卡片选项、全程附避坑提醒。第一次装修必选。</div>
+            </div>
+            <div class="choice-card" data-value="pro">
+              <div class="ico">⚡</div>
+              <div class="title">专业模式</div>
+              <div class="desc">假设你已有装修经验,跳过新手引导,提供更高精度的方案 + 自由编辑。</div>
+            </div>
+          </div>
+
+          <div class="nav-buttons">
+            <button class="btn btn-ghost" id="back-2">← 上一步</button>
+            <button class="btn btn-primary" id="next-2">下一步 →</button>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="step-content" data-step="3">
+          <h2 style="margin:0 0 6px;color:var(--color-deep);font-size:22px;">上传你的户型图</h2>
+          <p class="muted" style="margin:0;">原始结构图最准。JPG / PNG / PDF 都可以。</p>
+
+          <div class="upload-zone" id="upload-zone">
+            <div style="font-size:48px;color:var(--color-primary);margin-bottom:10px;">⬆</div>
+            <div style="font-weight:600;color:var(--color-deep);margin-bottom:4px;">拖拽户型图到这里,或点击上传</div>
+            <div class="tiny muted">支持 JPG / PNG / PDF · 单个文件 ≤ 10MB</div>
+          </div>
+
+          <div class="center">
+            <span class="demo-link" id="use-demo">没有户型图?使用 demo 户型一键体验 →</span>
+          </div>
+
+          <div class="divider"></div>
+
+          <div style="background:var(--color-info-bg);border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;">
+            <div style="font-size:22px;">💡</div>
+            <div>
+              <div style="font-weight:600;color:var(--color-deep);font-size:13px;margin-bottom:4px;">小贴士</div>
+              <div class="tiny muted">户型图识别约 80% 准确率,3D 建模后会让你<b>手动确认</b>每个房间标签,识别错了一键就能改。</div>
+            </div>
+          </div>
+
+          <div class="nav-buttons">
+            <button class="btn btn-ghost" id="back-3">← 上一步</button>
+            <a href="modeling.html" class="btn btn-primary" id="start-design">开始设计 ✨</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/shared.js"></script>
+  <script>
+    document.getElementById('topbar').innerHTML = AnxinHome.renderTopbar('workspace');
+
+    // Step navigation
+    let currentStep = 1;
+    const showStep = (n) => {
+      document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+      document.querySelector(`.step-content[data-step="${n}"]`).classList.add('active');
+      [1,2,3].forEach(i => {
+        const pill = document.getElementById(`pill-${i}`);
+        pill.classList.remove('active', 'done');
+        if (i < n) pill.classList.add('done');
+        else if (i === n) pill.classList.add('active');
+      });
+      currentStep = n;
+    };
+
+    // Step 1: type selection
+    document.querySelectorAll('[data-step="1"] .choice-card').forEach(card => {
+      card.onclick = () => {
+        document.querySelectorAll('[data-step="1"] .choice-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        const btn = document.getElementById('next-1');
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      };
+    });
+    document.getElementById('next-1').onclick = () => showStep(2);
+
+    // Step 2
+    document.querySelectorAll('[data-step="2"] .choice-card').forEach(card => {
+      card.onclick = () => {
+        document.querySelectorAll('[data-step="2"] .choice-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+      };
+    });
+    document.getElementById('back-2').onclick = () => showStep(1);
+    document.getElementById('next-2').onclick = () => showStep(3);
+
+    // Step 3
+    document.getElementById('back-3').onclick = () => showStep(2);
+    document.getElementById('use-demo').onclick = () => {
+      const zone = document.getElementById('upload-zone');
+      zone.classList.add('has-file');
+      zone.innerHTML = `
+        <div style="font-size:36px;color:var(--color-success);margin-bottom:10px;">✓</div>
+        <div style="font-weight:600;color:var(--color-deep);">已加载 demo 户型:朝阳·首开 96㎡</div>
+        <div class="tiny muted">3 室 1 厅 1 卫 · JPG 格式</div>
+      `;
+      AnxinHome.toast({ type: 'success', title: 'Demo 户型加载完成', msg: '点击「开始设计」进入建模阶段。' });
+    };
+  </script>
+</body>
+</html>

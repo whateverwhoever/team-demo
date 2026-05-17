@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>建模阶段 · 安心家</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <style>
+    .floorplan-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .room-rect {
+      fill: var(--color-surface-2);
+      stroke: var(--color-deep);
+      stroke-width: 2.5;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .room-rect:hover { fill: var(--color-primary-soft); }
+    .room-rect.living { fill: #FEF1E3; }
+    .room-rect.bedroom { fill: #F4EAE0; }
+    .room-rect.kitchen { fill: #FFF8E1; }
+    .room-rect.bath { fill: #E8F0F4; }
+    .room-rect.dining { fill: #FCE8DD; }
+
+    .door-line {
+      stroke: var(--color-primary);
+      stroke-width: 3;
+      fill: none;
+    }
+    .window-line {
+      stroke: var(--color-info);
+      stroke-width: 4;
+    }
+    .canvas-tip {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(46, 37, 30, 0.85);
+      color: white;
+      padding: 8px 16px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 5;
+    }
+    .confirm-bar {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-surface);
+      padding: 12px 16px 12px 20px;
+      border-radius: var(--radius-pill);
+      box-shadow: var(--shadow-pop);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      z-index: 5;
+    }
+    .room-tag {
+      font-weight: 700;
+      font-size: 13px;
+      fill: var(--color-deep);
+    }
+    .room-area {
+      font-size: 11px;
+      fill: var(--color-mute);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div id="topbar"></div>
+    <div id="progress"></div>
+
+    <div class="workspace">
+      <!-- Canvas -->
+      <div class="canvas-pane">
+        <div class="canvas-toolbar">
+          <div class="toolbar-group">
+            <button class="active">2D 平面图</button>
+            <button>3D 预览</button>
+          </div>
+          <div class="toolbar-group">
+            <button>📐 测距</button>
+            <button>🏷️ 改标签</button>
+          </div>
+          <div style="margin-left:auto;" class="tiny muted">📍 朝阳·首开 96㎡ · 已识别 6 个空间</div>
+        </div>
+
+        <div class="floorplan-container">
+          <div class="canvas-tip">💡 点击任意房间可修改名称或用途</div>
+
+          <svg class="floorplan-svg" viewBox="0 0 720 520" preserveAspectRatio="xMidYMid meet">
+            <!-- 外墙 -->
+            <rect x="40" y="40" width="640" height="440" fill="none" stroke="#4A3C32" stroke-width="4" />
+
+            <!-- 主卧 -->
+            <rect class="room-rect bedroom" data-room="A" x="40" y="40" width="240" height="180" />
+            <text class="room-tag" x="160" y="125" text-anchor="middle">A · 主卧</text>
+            <text class="room-area" x="160" y="145" text-anchor="middle">12.5 ㎡</text>
+
+            <!-- 次卧 -->
+            <rect class="room-rect bedroom" data-room="B" x="280" y="40" width="180" height="180" />
+            <text class="room-tag" x="370" y="125" text-anchor="middle">B · 次卧</text>
+            <text class="room-area" x="370" y="145" text-anchor="middle">9.0 ㎡</text>
+
+            <!-- 儿童房(默认还是次卧 已合并到 B,这里改一间为儿童房示范) -->
+            <rect class="room-rect bedroom" data-room="C" x="460" y="40" width="220" height="120" />
+            <text class="room-tag" x="570" y="95" text-anchor="middle">C · 儿童房</text>
+            <text class="room-area" x="570" y="115" text-anchor="middle">9.5 ㎡</text>
+
+            <!-- 卫生间 -->
+            <rect class="room-rect bath" data-room="D" x="460" y="160" width="100" height="120" />
+            <text class="room-tag" x="510" y="215" text-anchor="middle">D · 卫生间</text>
+            <text class="room-area" x="510" y="235" text-anchor="middle">4.5 ㎡</text>
+
+            <!-- 厨房 -->
+            <rect class="room-rect kitchen" data-room="E" x="560" y="160" width="120" height="120" />
+            <text class="room-tag" x="620" y="215" text-anchor="middle">E · 厨房</text>
+            <text class="room-area" x="620" y="235" text-anchor="middle">7.0 ㎡</text>
+
+            <!-- 客厅 -->
+            <rect class="room-rect living" data-room="F" x="40" y="220" width="340" height="260" />
+            <text class="room-tag" x="210" y="345" text-anchor="middle">F · 客厅</text>
+            <text class="room-area" x="210" y="365" text-anchor="middle">22.0 ㎡</text>
+
+            <!-- 餐厅 -->
+            <rect class="room-rect dining" data-room="G" x="380" y="280" width="180" height="200" />
+            <text class="room-tag" x="470" y="375" text-anchor="middle">G · 餐厅</text>
+            <text class="room-area" x="470" y="395" text-anchor="middle">11.0 ㎡</text>
+
+            <!-- 阳台 -->
+            <rect class="room-rect" data-room="H" x="560" y="280" width="120" height="200" fill="#E8F0F4" />
+            <text class="room-tag" x="620" y="375" text-anchor="middle">H · 阳台</text>
+            <text class="room-area" x="620" y="395" text-anchor="middle">5.0 ㎡</text>
+
+            <!-- 门(用弧形象征) -->
+            <path class="door-line" d="M 280 110 A 25 25 0 0 1 305 135" />
+            <path class="door-line" d="M 460 110 A 22 22 0 0 1 482 132" />
+            <path class="door-line" d="M 220 220 A 26 26 0 0 1 246 246" />
+            <path class="door-line" d="M 380 320 A 22 22 0 0 1 402 342" />
+            <path class="door-line" d="M 560 220 A 22 22 0 0 1 582 242" />
+
+            <!-- 窗户 -->
+            <line class="window-line" x1="100" y1="40" x2="200" y2="40" />
+            <line class="window-line" x1="310" y1="40" x2="430" y2="40" />
+            <line class="window-line" x1="490" y1="40" x2="640" y2="40" />
+            <line class="window-line" x1="560" y1="480" x2="680" y2="480" />
+            <line class="window-line" x1="40" y1="280" x2="40" y2="420" />
+
+            <!-- 入户门 -->
+            <rect x="160" y="475" width="60" height="10" fill="#E8825B" />
+            <text x="190" y="500" text-anchor="middle" font-size="11" fill="#E8825B" font-weight="600">入户门</text>
+          </svg>
+
+          <div class="confirm-bar">
+            <div class="tiny muted">识别完成后,确认结构进入 3D 建模</div>
+            <a href="global-design.html" class="btn btn-primary btn-sm">确认结构 · 下一步 →</a>
+          </div>
+        </div>
+
+        <div class="legend">
+          <span><span class="swatch" style="background:#F4EAE0;border:1px solid #4A3C32;"></span>卧室</span>
+          <span><span class="swatch" style="background:#FEF1E3;border:1px solid #4A3C32;"></span>客厅/餐厅</span>
+          <span><span class="swatch" style="background:#FFF8E1;border:1px solid #4A3C32;"></span>厨房</span>
+          <span><span class="swatch" style="background:#E8F0F4;border:1px solid #4A3C32;"></span>卫生间/阳台</span>
+          <span><span class="swatch" style="background:#E8825B;"></span>门</span>
+          <span><span class="swatch" style="background:#6FA9C9;"></span>窗</span>
+        </div>
+      </div>
+
+      <!-- Chat -->
+      <aside class="chat-pane">
+        <div class="chat-header">
+          <span class="live-dot"></span>
+          <span>AI 助手 · 建模阶段</span>
+          <span class="tag tag-primary" style="margin-left:auto;">小白模式</span>
+        </div>
+        <div class="chat-stream" id="chat"></div>
+        <div class="chat-input">
+          <input id="chat-input" placeholder="告诉我你的想法,比如「厨房太窄」..." />
+          <button class="chat-send" id="chat-send">▶</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="js/shared.js"></script>
+  <script src="js/chat-script.js"></script>
+  <script>
+    document.getElementById('topbar').innerHTML = AnxinHome.renderTopbar('workspace');
+    document.getElementById('progress').innerHTML = AnxinHome.renderProgress('modeling');
+
+    const chat = document.getElementById('chat');
+    const script = window.AnxinChatScripts.modeling;
+    let idx = 0;
+
+    async function playNext() {
+      if (idx >= script.length) return;
+      const step = script[idx++];
+
+      if (step.role === 'ai') {
+        const typing = AnxinHome.appendBubble(chat, { role: 'ai', withTyping: true });
+        await AnxinHome.delay(700);
+        typing.remove();
+        AnxinHome.appendBubble(chat, { role: 'ai', html: step.text });
+        await AnxinHome.delay(300);
+        playNext();
+      } else if (step.role === 'system') {
+        AnxinHome.appendBubble(chat, { role: 'system', html: step.text });
+        await AnxinHome.delay(200);
+        playNext();
+      } else if (step.role === 'user') {
+        AnxinHome.appendBubble(chat, { role: 'user', html: step.text });
+        await AnxinHome.delay(200);
+        playNext();
+      } else if (step.role === 'options') {
+        AnxinHome.appendOptions(chat, step.options, (opt) => {
+          AnxinHome.appendBubble(chat, { role: 'user', html: opt.label });
+          if (opt.goto) {
+            setTimeout(() => { window.location.href = opt.goto; }, 600);
+          } else {
+            setTimeout(playNext, 400);
+          }
+        });
+      }
+    }
+
+    setTimeout(playNext, 400);
+
+    // Room click → highlight + chat hint
+    document.querySelectorAll('.room-rect').forEach(rect => {
+      rect.onclick = () => {
+        document.querySelectorAll('.room-rect').forEach(r => r.style.strokeWidth = '2.5');
+        rect.style.strokeWidth = '4';
+        rect.style.stroke = 'var(--color-primary)';
+        const room = rect.dataset.room;
+        AnxinHome.toast({
+          type: 'info',
+          title: `已锁定 ${rect.querySelector('text').textContent}`,
+          msg: '在右侧对话框中可以单独描述这个空间的需求。',
+          duration: 3000,
+        });
+      };
+    });
+
+    // Manual chat send (mock)
+    document.getElementById('chat-send').onclick = () => {
+      const v = document.getElementById('chat-input').value.trim();
+      if (!v) return;
+      AnxinHome.appendBubble(chat, { role: 'user', html: v });
+      document.getElementById('chat-input').value = '';
+      setTimeout(() => {
+        const typing = AnxinHome.appendBubble(chat, { role: 'ai', withTyping: true });
+        setTimeout(() => {
+          typing.remove();
+          AnxinHome.appendBubble(chat, { role: 'ai', html: '收到 ✅ 我会把这条记录到方案需求里。' });
+        }, 900);
+      }, 200);
+    };
+  </script>
+</body>
+</html>
