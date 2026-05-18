@@ -422,7 +422,8 @@
 
         document.getElementById('drawer-title').textContent = name;
         document.getElementById('drawer-body').innerHTML = `
-          <div class="drawer-thumb">${emoji}</div>
+          <div class="drawer-thumb"></div>
+          
 
           <div class="prop-row" style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--color-line);">
             <span style="color:var(--color-mute);font-size:13px;">参考价</span>
@@ -456,6 +457,20 @@
             · 靠墙摆放建议留 10cm 散热距离
           </div>
         `;
+        
+          // ==============================================
+          // ✅ 这是关键：让详情页显示和列表一样的 3D 图
+          // ==============================================
+          const thumb = document.querySelector('.drawer-thumb');
+          thumb.style.background = 'none';
+          thumb.style.backgroundSize = 'cover';
+          thumb.style.backgroundPosition = 'center';
+          thumb.style.backgroundRepeat = 'no-repeat';
+
+          // 直接用卡片上已经有的图片！
+          const cardThumbStyle = window.getComputedStyle(card.querySelector('.thumb')).backgroundImage;
+          thumb.style.backgroundImage = cardThumbStyle;
+
         drawer.classList.add('open');
         backdrop.classList.add('open');
       };

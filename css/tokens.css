@@ -612,13 +612,46 @@ button {
   box-shadow: 0 0 0 4px var(--color-primary-soft);
 }
 
-.style-card .thumb {
+/* .style-card .thumb {
   height: 80px;
   background: linear-gradient(135deg, var(--color-accent), var(--color-primary-soft));
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 28px;
+} */
+
+.style-card .thumb {
+  height: 80px;
+  background: none !important;        /* 去掉渐变 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0 !important;            /* 隐藏 Emoji */
+  background-size: cover !important;  /* 图片铺满 */
+  background-position: center !important; /* 图片居中 */
+  background-repeat: no-repeat !important;
+}
+
+/*--------------------------------------------
+*/
+.style-card[data-style="现代简约"] .thumb {
+  background-image: url("../assets/styles/现代简约.jpg") !important;
+}
+.style-card[data-style="北欧"] .thumb {
+  background-image: url("../assets/styles/北欧.png") !important;
+}
+.style-card[data-style="奶油"] .thumb {
+  background-image: url("../assets/styles/奶油.jpg") !important;
+}
+.style-card[data-style="日式"] .thumb {
+  background-image: url("../assets/styles/日式.jpg") !important;
+}
+.style-card[data-style="新中式"] .thumb {
+  background-image: url("../assets/styles/新中式.jpg") !important;
+}
+.style-card[data-style="复古"] .thumb {
+  background-image: url("../assets/styles/复古.jpg") !important;
 }
 
 .style-card .label {
@@ -797,14 +830,66 @@ button {
   box-shadow: var(--shadow-lift);
 }
 
-.furniture-card .thumb {
+/* .furniture-card .thumb {
   height: 140px;
-  background: linear-gradient(135deg, var(--color-surface-2), var(--color-primary-soft));
+  background: linear-gradient(135deg, var(--color-surface-2 ), var(--color-primary-soft));
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 48px;
+} */
+
+.furniture-card .thumb {
+  height: 140px;
+  background: none !important;        /* 去掉渐变 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0 !important;            /* 隐藏 Emoji */
+  background-size: cover !important;  /* 图片铺满 */
+  background-position: center !important; /* 图片居中 */
+  background-repeat: no-repeat !important;
 }
+
+/*--------------------------------------------
+*/
+.furniture-card[data-emoji="🛋️"] .thumb {
+  background-image: url("../assets/furniture/奶油布艺三人沙发.webp") !important;
+}
+.furniture-card[data-emoji="🛏️"] .thumb {
+  background-image: url("../assets/furniture/实木双人床.jpg") !important;
+}
+.furniture-card[data-emoji="🗄️"] .thumb {
+  background-image: url("../assets/furniture/定制大衣柜.jpg") !important;
+}
+.furniture-card[data-emoji="🧸"] .thumb {
+  background-image: url("../assets/furniture/实木儿童双层床.webp") !important;
+}
+.furniture-card[data-emoji="📺"] .thumb {
+  background-image: url("../assets/furniture/岩板电视柜.webp") !important;
+}
+.furniture-card[data-emoji="🍽️"] .thumb {
+  background-image: url("../assets/furniture/4人实木餐桌.jpg") !important;
+}
+.furniture-card[data-emoji="📚"] .thumb {
+  background-image: url("../assets/furniture/可升降儿童书桌.webp") !important;
+}
+.furniture-card[data-emoji="🪞"] .thumb {
+  background-image: url("../assets/furniture/复古梳妆台.webp") !important;
+}
+.furniture-card[data-emoji="💡"] .thumb {
+  background-image: url("../assets/furniture/无主灯吸顶灯.webp") !important;
+}
+.furniture-card[data-emoji="🐱"] .thumb {
+  background-image: url("../assets/furniture/猫咪爬架.jpg") !important;
+}
+.furniture-card[data-emoji="🪔"] .thumb {
+  background-image: url("../assets/furniture/奶油风落地灯.jpg") !important;
+}
+.furniture-card[data-emoji="🪴"] .thumb {
+  background-image: url("../assets/furniture/琴叶榕.webp") !important;
+}
+
 
 .furniture-card .info { padding: 10px 14px; }
 .furniture-card .name { font-size: 13px; font-weight: 600; color: var(--color-deep); }
@@ -979,3 +1064,4 @@ button {
   margin-right: 4px;
   vertical-align: middle;
 }
+
