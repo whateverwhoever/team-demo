@@ -963,6 +963,7 @@ button {
   cursor: pointer;
 }
 
+
 .project-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-lift);
@@ -977,6 +978,30 @@ button {
   font-size: 56px;
   color: white;
 }
+
+/* 只修改非新建项目的卡片：去掉渐变、隐藏emoji、显示图片 */
+.project-card:not(.new) .cover {
+  height: 160px;
+  background: none !important;
+  background-size: cover !important; 
+  background-position: center !important;
+  background-repeat: no-repeat !important; 
+  font-size: 0 !important;
+}
+
+/* 第2个：朝阳·首开 */
+.project-card:nth-child(2) .cover {
+  background-image: url("../assets/show/朝阳·首开.jpg") !important;
+}
+/* 第3个：书房改儿童房 */
+.project-card:nth-child(3) .cover {
+  background-image: url("../assets/show/书房改儿童房.jpg") !important;
+}
+/* 第4个：租房软装翻新 */
+.project-card:nth-child(4) .cover {
+  background-image: url("../assets/show/租房软装翻新.jpg") !important;
+}
+
 
 .project-card.new .cover {
   background: var(--color-surface-2);
