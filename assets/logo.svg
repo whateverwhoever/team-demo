@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E8825B"/>
+      <stop offset="1" stop-color="#F2C8A0"/>
+    </linearGradient>
+  </defs>
+  <!-- 圆角方底 -->
+  <rect x="4" y="4" width="112" height="112" rx="24" fill="url(#bg)"/>
+  <!-- 安 -->
+  <text x="60" y="82" text-anchor="middle" fill="white" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans CJK SC',sans-serif" font-size="62" font-weight="700">安</text>
+</svg>

@@ -13,7 +13,7 @@ AnxinHome.renderTopbar = function (activeNav) {
   return `
     <header class="topbar">
       <a class="brand" href="index.html">
-        <div class="brand-icon">安</div>
+        <img class="brand-icon" src="assets/logo.svg" alt="安心家" width="32" height="32">
         <div>安心家
           <span class="brand-tag">装修不慌,AI 兜底</span>
         </div>
