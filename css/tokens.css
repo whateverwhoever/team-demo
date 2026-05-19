@@ -1090,3 +1090,11 @@ button {
   vertical-align: middle;
 }
 
+.render-img {
+  opacity: 0;
+  transition: 0.8s ease;
+}
+
+.render-img.show {
+  opacity: 1;
+}

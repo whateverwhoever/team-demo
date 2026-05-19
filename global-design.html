@@ -15,6 +15,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
+
+      height: 100%;
+      min-height: 500px;
+      max-height: 700px;
     }
     .render-skeleton {
       width: 80%;
@@ -148,47 +152,62 @@
             <button>360° 全景</button>
           </div>
           <div class="toolbar-group">
-            <button>☀️ 白天</button>
-            <button>🌆 黄昏</button>
-            <button>🌙 夜晚</button>
+            <button class="active" id="btn-day">☀️ 白天</button>
+            <button id="btn-dusk">🌆 黄昏</button>
+            <button id="btn-night">🌙 夜晚</button>
           </div>
           <div style="margin-left:auto;" class="tiny muted">⏱️ 方案 v1 · 生成于 2 分钟前</div>
         </div>
 
         <div class="render-stage" id="render-stage">
           <div class="render-result">
-            <div class="render-overlay-tip">
+
+            <div class="render-overlay-tip" style="display: none; z-index: 100;">
               <span>🌟</span>
-              <span><b>奶油风</b> · 暖色基调 · 舒适档</span>
+              <span><b>客厅</b> ·奶油风</b> · 暖色基调 · 舒适档</span>
             </div>
 
-            <div class="room-illustrations">
-              <div class="mini-room living">
-                <span class="deco" style="top:20%;left:15%;">🛋️</span>
-                <span class="deco" style="top:35%;right:20%;font-size:28px;">🪴</span>
-                <span class="deco" style="bottom:25%;left:30%;font-size:28px;">📺</span>
-                <span class="label">客厅 · 22㎡</span>
-              </div>
-              <div class="mini-room master">
-                <span class="deco" style="top:25%;left:30%;">🛏️</span>
-                <span class="deco" style="bottom:30%;right:15%;font-size:28px;">🪟</span>
-                <span class="label">主卧 · 12.5㎡</span>
-              </div>
-              <div class="mini-room kid">
-                <span class="deco" style="top:20%;left:20%;font-size:32px;">🧸</span>
-                <span class="deco" style="bottom:25%;right:20%;font-size:28px;">📚</span>
-                <span class="label">儿童房 · 9.5㎡</span>
-              </div>
-              <div class="mini-room kitchen">
-                <span class="deco" style="top:25%;left:25%;font-size:30px;">🍳</span>
-                <span class="deco" style="bottom:25%;right:20%;font-size:26px;">🍽️</span>
-                <span class="label">厨房+餐厅</span>
-              </div>
-              <div class="mini-room bath">
-                <span class="deco" style="top:25%;left:30%;font-size:30px;">🛁</span>
-                <span class="label">卫生间</span>
-              </div>
+            <!-- 👇 正确位置：图片放在 render-result 内部！！！ -->
+            <img 
+              id="render-img"
+              class="render-img"
+              src="assets/styles/4.jpeg" 
+              style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: 14px;
+              ">
+            <!-- <div class="room-illustrations">
+            <div class="mini-room living">
+              <span class="deco" style="top:20%;left:15%;">🛋️</span>
+              <span class="deco" style="top:35%;right:20%;font-size:28px;">🪴</span>
+              <span class="deco" style="bottom:25%;left:30%;font-size:28px;">📺</span>
+              <span class="label">客厅 · 22㎡</span>
             </div>
+            <div class="mini-room master">
+              <span class="deco" style="top:25%;left:30%;">🛏️</span>
+              <span class="deco" style="bottom:30%;right:15%;font-size:28px;">🪟</span>
+              <span class="label">主卧 · 12.5㎡</span>
+            </div>
+            <div class="mini-room kid">
+              <span class="deco" style="top:20%;left:20%;font-size:32px;">🧸</span>
+              <span class="deco" style="bottom:25%;right:20%;font-size:28px;">📚</span>
+              <span class="label">儿童房 · 9.5㎡</span>
+            </div>
+            <div class="mini-room kitchen">
+              <span class="deco" style="top:25%;left:25%;font-size:30px;">🍳</span>
+              <span class="deco" style="bottom:25%;right:20%;font-size:26px;">🍽️</span>
+              <span class="label">厨房+餐厅</span>
+            </div>
+            <div class="mini-room bath">
+              <span class="deco" style="top:25%;left:30%;font-size:30px;">🛁</span>
+              <span class="label">卫生间</span>
+            </div>
+          </div> -->
 
             <div class="render-overlay-actions">
               <button class="btn btn-ghost btn-sm" style="background:rgba(255,255,255,0.92);">🔄 重新生成</button>
@@ -307,7 +326,12 @@
         AnxinHome.appendBubble(chat, {
           role: 'system',
           html: '👇 请在下方面板选择喜欢的风格(已默认选中:奶油风)'
+          
         });
+        setTimeout(() => {
+        document.getElementById('render-img').classList.add('show');
+        document.querySelector('.render-overlay-tip').style.display = 'flex';
+      }, 1000);
         await AnxinHome.delay(800);
         playNext();
       } else if (step.role === 'sliders') {
@@ -320,6 +344,11 @@
       } else if (step.role === 'options') {
         AnxinHome.appendOptions(chat, step.options, (opt) => {
           AnxinHome.appendBubble(chat, { role: 'user', html: opt.label });
+          if (step.text.includes('奶油风')) {
+            setTimeout(() => {
+              document.getElementById('render-img').classList.add('show');
+            }, 600);
+          }
           if (opt.goto) {
             setTimeout(() => { window.location.href = opt.goto; }, 600);
           } else {
@@ -372,6 +401,42 @@
           AnxinHome.appendBubble(chat, { role: 'ai', html: '已记录到方案需求 ✅' });
         }, 900);
       }, 200);
+    };
+
+    // 👉 切换 active 状态（只保留一个）
+    function setActive(btn) {
+      btnDay.classList.remove('active');
+      btnDusk.classList.remove('active');
+      btnNight.classList.remove('active');
+
+      btn.classList.add('active');
+    }
+
+
+    // 👉 获取图片元素
+    const renderImg = document.getElementById('render-img');
+
+    // 👉 获取按钮
+    const btnDay = document.getElementById('btn-day');
+    const btnDusk = document.getElementById('btn-dusk');
+    const btnNight = document.getElementById('btn-night');
+
+    // 👉 点击“白天”
+    btnDay.onclick = () => {
+      setActive(btnDay);
+      renderImg.src = "assets/styles/4.jpeg";
+    };
+
+    // 👉 点击“黄昏”
+    btnDusk.onclick = () => {
+      setActive(btnDusk);
+      renderImg.src = "assets/styles/4_黄昏.png";
+    };
+
+    // 👉 点击“夜晚”
+    btnNight.onclick = () => {
+      setActive(btnNight);
+      renderImg.src = "assets/styles/4_夜晚.png";
     };
   </script>
 </body>
