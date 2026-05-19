@@ -148,8 +148,8 @@
       <div class="canvas-pane">
         <div class="canvas-toolbar">
           <div class="toolbar-group">
-            <button>2D 平面图</button>
-            <button class="active">3D 渲染</button>
+            <button id="btn-2d">2D 平面图</button>
+            <button id="btn-3d" class="active">3D 渲染</button>
             <button>360° 全景</button>
           </div>
           <div class="toolbar-group">
@@ -363,12 +363,21 @@
 
     // Style cards interaction
     document.querySelectorAll('.style-card').forEach(card => {
-      card.onclick = () => {
-        document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        const style = card.dataset.style;
-        AnxinHome.toast({ type: 'info', title: '风格已切换', msg: `已切换为「${style}」,正在重新生成预览...`, duration: 3500 });
-      };
+     card.onclick = () => {
+      document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+
+      currentStyle = card.dataset.style;
+
+      AnxinHome.toast({
+        type: 'info',
+        title: '风格已切换',
+        msg: `已切换为「${currentStyle}」,正在重新生成预览...`,
+        duration: 3500
+      });
+
+      updateImage(); // ⭐关键
+    };
     });
 
     // Budget pills
@@ -403,6 +412,10 @@
         }, 900);
       }, 200);
     };
+    
+    const btnDay = document.getElementById('btn-day');
+    const btnDusk = document.getElementById('btn-dusk');
+    const btnNight = document.getElementById('btn-night');
 
     // 👉 切换 active 状态（只保留一个）
     function setActive(btn) {
@@ -412,33 +425,63 @@
 
       btn.classList.add('active');
     }
+    btnDay.onclick = () => {
+      setActive(btnDay);
+      currentTime = "day";
+      updateImage();
+    };
 
+    btnDusk.onclick = () => {
+      setActive(btnDusk);
+      currentTime = "dusk";
+      updateImage();
+    };
+
+    btnNight.onclick = () => {
+      setActive(btnNight);
+      currentTime = "night";
+      updateImage();
+    };
+
+    const btn2D = document.getElementById('btn-2d');
+    const btn3D = document.getElementById('btn-3d');
+
+    function setModeActive(btn) {
+      btn2D.classList.remove('active');
+      btn3D.classList.remove('active');
+      btn.classList.add('active');
+    }
+
+    btn2D.onclick = () => {
+      setModeActive(btn2D);
+      renderImg.src = "assets/styles/4_2D图.png";
+    };
+
+    btn3D.onclick = () => {
+      setModeActive(btn3D);
+      updateImage();
+    };
 
     // 👉 获取图片元素
     const renderImg = document.getElementById('render-img');
-
-    // 👉 获取按钮
-    const btnDay = document.getElementById('btn-day');
-    const btnDusk = document.getElementById('btn-dusk');
-    const btnNight = document.getElementById('btn-night');
-
-    // 👉 点击“白天”
-    btnDay.onclick = () => {
-      setActive(btnDay);
-      renderImg.src = "assets/styles/4.jpeg";
+        const imageMap = {
+      奶油: {
+        day: "assets/styles/4.jpeg",
+        dusk: "assets/styles/4_黄昏.png",
+        night: "assets/styles/4_夜晚.png"
+      },
+      日式: {
+        day: "assets/styles/4_日式.png",
+        dusk: "assets/styles/4_日式_黄昏.png",
+        night: "assets/styles/4_日式_夜晚.png"
+      }
     };
+    let currentStyle = "奶油";
+    let currentTime = "day";
+    function updateImage() {
+      renderImg.src = imageMap[currentStyle][currentTime];
+    }
 
-    // 👉 点击“黄昏”
-    btnDusk.onclick = () => {
-      setActive(btnDusk);
-      renderImg.src = "assets/styles/4_黄昏.png";
-    };
-
-    // 👉 点击“夜晚”
-    btnNight.onclick = () => {
-      setActive(btnNight);
-      renderImg.src = "assets/styles/4_夜晚.png";
-    };
   </script>
 </body>
-</html>
+</html>  
