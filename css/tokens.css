@@ -100,6 +100,22 @@ button {
   margin-left: 4px;
 }
 
+.topbar .right .mode-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  margin-right: 4px;
+}
+.topbar .right .mode-badge.tag-novice {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+.topbar .right .mode-badge.tag-pro {
+  background: var(--color-deep);
+  color: var(--color-accent);
+}
+
 .topbar .nav {
   display: flex;
   gap: 24px;
