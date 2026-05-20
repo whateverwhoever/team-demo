@@ -382,17 +382,22 @@
         playNext();
       } else if (step.role === 'options') {
         AnxinHome.appendOptions(chat, step.options, (opt) => {
+          // ✅ 先处理跳转（避免被后面逻辑影响）
+          if (opt.goto) {
+            console.log('跳转到:', opt.goto); // 调试用
+            window.location.href = opt.goto;
+            return;
+          }
+
           AnxinHome.appendBubble(chat, { role: 'user', html: opt.label });
-          if (step.text.includes('奶油风')) {
+          if (step.text && step.text.includes('奶油风')) {
             setTimeout(() => {
               document.getElementById('render-img').classList.add('show');
             }, 600);
           }
-          if (opt.goto) {
-            setTimeout(() => { window.location.href = opt.goto; }, 600);
-          } else {
-            setTimeout(playNext, 400);
-          }
+          
+          setTimeout(playNext, 400);
+          
         });
       }
     }
