@@ -144,6 +144,15 @@
       font-size: 48px;
       margin-bottom: 6px;
     }
+
+    .color-swatch {
+      border: 2px solid transparent;
+      transition: 0.15s;
+    }
+    .color-swatch.selected {
+      border-color: var(--color-deep);
+      box-shadow: 0 0 0 2px var(--color-primary-soft);
+    }
   </style>
 </head>
 <body>
@@ -158,49 +167,55 @@
         <div class="filter-group">
           <h4>家具类型</h4>
           <div class="filter-options">
-            <label><input type="checkbox" checked> 沙发 (24)</label>
-            <label><input type="checkbox" checked> 床 (18)</label>
-            <label><input type="checkbox"> 衣柜 (32)</label>
-            <label><input type="checkbox"> 桌椅 (46)</label>
-            <label><input type="checkbox"> 灯具 (52)</label>
-            <label><input type="checkbox"> 装饰 (88)</label>
+            <label><input type="checkbox" class="filter-category" value="沙发" checked> 沙发 (24)</label>
+            <label><input type="checkbox" class="filter-category" value="床" checked> 床 (18)</label>
+            <label><input type="checkbox" class="filter-category" value="衣柜"> 衣柜 (32)</label>
+            <label><input type="checkbox" class="filter-category" value="桌椅"> 桌椅 (46)</label>
+            <label><input type="checkbox" class="filter-category" value="灯具"> 灯具 (52)</label>
+            <label><input type="checkbox" class="filter-category" value="装饰"> 装饰 (88)</label>
           </div>
         </div>
 
         <div class="filter-group">
           <h4>风格</h4>
           <div class="filter-options">
-            <label><input type="checkbox" checked> 奶油风</label>
-            <label><input type="checkbox"> 北欧</label>
-            <label><input type="checkbox"> 现代简约</label>
-            <label><input type="checkbox"> 日式</label>
-            <label><input type="checkbox"> 新中式</label>
-            <label><input type="checkbox"> 复古</label>
+            <label><input type="checkbox" class="filter-style" value="奶油风" checked> 奶油风</label>
+            <label><input type="checkbox" class="filter-style" value="北欧"> 北欧</label>
+            <label><input type="checkbox" class="filter-style" value="现代简约"> 现代简约</label>
+            <label><input type="checkbox" class="filter-style" value="日式"> 日式</label>
+            <label><input type="checkbox" class="filter-style" value="新中式"> 新中式</label>
+            <label><input type="checkbox" class="filter-style" value="复古"> 复古</label>
           </div>
         </div>
 
         <div class="filter-group">
           <h4>主色调</h4>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;">
-            <div style="width:24px;height:24px;background:#FBF3EA;border:2px solid var(--color-deep);border-radius:6px;cursor:pointer;"></div>
-            <div style="width:24px;height:24px;background:#E8DCC8;border-radius:6px;cursor:pointer;"></div>
-            <div style="width:24px;height:24px;background:#C9A878;border-radius:6px;cursor:pointer;"></div>
-            <div style="width:24px;height:24px;background:#8A6A4A;border-radius:6px;cursor:pointer;"></div>
-            <div style="width:24px;height:24px;background:#4A3C32;border-radius:6px;cursor:pointer;"></div>
-            <div style="width:24px;height:24px;background:#E8825B;border-radius:6px;cursor:pointer;"></div>
-            <div style="width:24px;height:24px;background:#7BB37A;border-radius:6px;cursor:pointer;"></div>
-            <div style="width:24px;height:24px;background:#6FA9C9;border-radius:6px;cursor:pointer;"></div>
+          <div class="color-swatches" style="display:flex;flex-wrap:wrap;gap:8px;">
+            <div class="color-swatch" data-color="米白" style="width:24px;height:24px;background:#FBF3EA;border-radius:6px;cursor:pointer;"></div>
+            <div class="color-swatch" data-color="原木" style="width:24px;height:24px;background:#E8DCC8;border-radius:6px;cursor:pointer;"></div>
+            <div class="color-swatch" data-color="浅棕" style="width:24px;height:24px;background:#C9A878;border-radius:6px;cursor:pointer;"></div>
+            <div class="color-swatch" data-color="深棕" style="width:24px;height:24px;background:#8A6A4A;border-radius:6px;cursor:pointer;"></div>
+            <div class="color-swatch" data-color="深褐" style="width:24px;height:24px;background:#4A3C32;border-radius:6px;cursor:pointer;"></div>
+            <div class="color-swatch" data-color="橙色" style="width:24px;height:24px;background:#E8825B;border-radius:6px;cursor:pointer;"></div>
+            <div class="color-swatch" data-color="绿色" style="width:24px;height:24px;background:#7BB37A;border-radius:6px;cursor:pointer;"></div>
+            <div class="color-swatch" data-color="蓝色" style="width:24px;height:24px;background:#6FA9C9;border-radius:6px;cursor:pointer;"></div>
           </div>
         </div>
 
         <div class="filter-group">
           <h4>价格区间</h4>
           <div class="filter-options">
-            <label><input type="radio" name="price" checked> 全部</label>
-            <label><input type="radio" name="price"> 500 以下</label>
-            <label><input type="radio" name="price"> 500 - 2000</label>
-            <label><input type="radio" name="price"> 2000 - 8000</label>
-            <label><input type="radio" name="price"> 8000 以上</label>
+            <label><input type="radio" name="price" value="0,999999" checked> 全部</label>
+            <label><input type="radio" name="price" value="0,500"> 500 以下</label>
+            <label><input type="radio" name="price" value="500,2000"> 500 - 2000</label>
+            <label><input type="radio" name="price" value="2000,8000"> 2000 - 8000</label>
+            <label><input type="radio" name="price" value="8000,999999"> 8000 以上</label>
+            <label><input type="radio" name="price" value="custom"> 自定义</label>
+          </div>
+          <div class="custom-price" id="custom-price" style="display:none;gap:8px;align-items:center;margin-top:8px;">
+            <input type="number" id="price-min" placeholder="最低价" min="0" style="width:80px;padding:4px 8px;border:1px solid var(--color-line);border-radius:6px;font-size:13px;font-family:inherit;">
+            <span style="color:var(--color-mute);font-size:13px;">—</span>
+            <input type="number" id="price-max" placeholder="最高价" min="0" style="width:80px;padding:4px 8px;border:1px solid var(--color-line);border-radius:6px;font-size:13px;font-family:inherit;">
           </div>
         </div>
 
@@ -234,7 +249,7 @@
             <div class="tiny muted mt-2">支持 JPG / PNG · 会 AI 建 3D 模型</div>
           </div>
 
-          <div class="furniture-card" data-name="奶油布艺三人沙发" data-price="6800" data-size="2.4m × 0.95m × 0.85m" data-emoji="🛋️">
+          <div class="furniture-card" data-name="奶油布艺三人沙发" data-price="6800" data-size="2.4m × 0.95m × 0.85m" data-emoji="🛋️" data-category="沙发" data-style="奶油风" data-source="系统库" data-color="米白">
             <div class="thumb" style="background:linear-gradient(135deg,#FCE3D5,#F2C8A0);">🛋️</div>
             <div class="info">
               <div class="name">奶油布艺三人沙发</div>
@@ -246,7 +261,7 @@
             </div>
           </div>
 
-          <div class="furniture-card" data-name="实木双人床 1.8m" data-price="4800" data-size="1.8m × 2.0m" data-emoji="🛏️">
+          <div class="furniture-card" data-name="实木双人床 1.8m" data-price="4800" data-size="1.8m × 2.0m" data-emoji="🛏️" data-category="床" data-style="奶油风" data-source="系统库" data-color="原木">
             <div class="thumb" style="background:linear-gradient(135deg,#E8DCC8,#C9A878);">🛏️</div>
             <div class="info">
               <div class="name">实木双人床 · 1.8m</div>
@@ -258,7 +273,7 @@
             </div>
           </div>
 
-          <div class="furniture-card" data-name="定制大衣柜 4m" data-price="12000" data-size="4.0m × 0.6m × 2.4m" data-emoji="🗄️">
+          <div class="furniture-card" data-name="定制大衣柜 4m" data-price="12000" data-size="4.0m × 0.6m × 2.4m" data-emoji="🗄️" data-category="衣柜" data-style="奶油风" data-source="系统库" data-color="米白">
             <div class="thumb" style="background:linear-gradient(135deg,#FBF3EA,#E8DCC8);">🗄️</div>
             <div class="info">
               <div class="name">定制大衣柜 · 4m</div>
@@ -270,7 +285,7 @@
             </div>
           </div>
 
-          <div class="furniture-card" data-name="实木儿童双层床" data-price="3600" data-size="1.2m × 1.9m" data-emoji="🧸">
+          <div class="furniture-card" data-name="实木儿童双层床" data-price="3600" data-size="1.2m × 1.9m" data-emoji="🧸" data-category="床" data-style="奶油风" data-source="系统库" data-color="米白">
             <div class="thumb" style="background:linear-gradient(135deg,#FCE3D5,#F2B89B);">🧸</div>
             <div class="info">
               <div class="name">儿童双层床</div>
@@ -282,7 +297,7 @@
             </div>
           </div>
 
-          <div class="furniture-card" data-name="岩板电视柜" data-price="3200" data-size="2.0m × 0.4m" data-emoji="📺">
+          <div class="furniture-card" data-name="岩板电视柜" data-price="3200" data-size="2.0m × 0.4m" data-emoji="📺" data-category="装饰" data-style="现代简约" data-source="系统库">
             <div class="thumb" style="background:linear-gradient(135deg,#F5F0E8,#D8C8B0);">📺</div>
             <div class="info">
               <div class="name">岩板电视柜</div>
@@ -294,7 +309,7 @@
             </div>
           </div>
 
-          <div class="furniture-card" data-name="4 人实木餐桌" data-price="2400" data-size="1.4m × 0.8m" data-emoji="🍽️">
+          <div class="furniture-card" data-name="4 人实木餐桌" data-price="2400" data-size="1.4m × 0.8m" data-emoji="🍽️" data-category="桌椅" data-style="日式" data-source="AI 生成" data-color="原木">
             <div class="thumb" style="background:linear-gradient(135deg,#EFE5D5,#C9A878);">🍽️</div>
             <div class="info">
               <div class="name">4 人实木餐桌</div>
@@ -306,7 +321,7 @@
             </div>
           </div>
 
-          <div class="furniture-card" data-name="可升降儿童书桌" data-price="1800" data-size="1.2m × 0.5m" data-emoji="📚">
+          <div class="furniture-card" data-name="可升降儿童书桌" data-price="1800" data-size="1.2m × 0.5m" data-emoji="📚" data-category="桌椅" data-style="现代简约" data-source="系统库" data-color="橙色">
             <div class="thumb" style="background:linear-gradient(135deg,#FCE3D5,#E8825B);">📚</div>
             <div class="info">
               <div class="name">可升降儿童书桌</div>
@@ -318,7 +333,7 @@
             </div>
           </div>
 
-          <div class="furniture-card" data-name="复古梳妆台 (我的)" data-price="2200" data-size="1.0m × 0.4m" data-emoji="🪞">
+          <div class="furniture-card" data-name="复古梳妆台 (我的)" data-price="2200" data-size="1.0m × 0.4m" data-emoji="🪞" data-category="桌椅" data-style="复古" data-source="我的上传" data-color="深棕">
             <div class="thumb" style="background:linear-gradient(135deg,#E8DCC8,#8A6A4A);">🪞</div>
             <div class="info">
               <div class="name">复古梳妆台</div>
@@ -330,7 +345,7 @@
             </div>
           </div>
 
-          <div class="furniture-card" data-name="无主灯吸顶灯" data-price="580" data-size="Ø 50cm" data-emoji="💡">
+          <div class="furniture-card" data-name="无主灯吸顶灯" data-price="580" data-size="Ø 50cm" data-emoji="💡" data-category="灯具" data-style="现代简约" data-source="系统库" data-color="米白">
             <div class="thumb" style="background:linear-gradient(135deg,#FFF4D6,#FCE3D5);">💡</div>
             <div class="info">
               <div class="name">无主灯吸顶灯</div>
@@ -342,7 +357,7 @@
             </div>
           </div>
 
-          <div class="furniture-card" data-name="猫咪爬架(现货)" data-price="480" data-size="0.4m × 0.4m × 1.8m" data-emoji="🐱">
+          <div class="furniture-card" data-name="猫咪爬架(现货)" data-price="480" data-size="0.4m × 0.4m × 1.8m" data-emoji="🐱" data-category="装饰" data-style="现代简约" data-source="我的上传" data-color="原木">
             <div class="thumb" style="background:linear-gradient(135deg,#F2C8A0,#C9A878);">🐱</div>
             <div class="info">
               <div class="name">猫咪爬架</div>
@@ -354,7 +369,7 @@
             </div>
           </div>
 
-          <div class="furniture-card" data-name="奶油风落地灯" data-price="320" data-size="H 1.6m" data-emoji="🪔">
+          <div class="furniture-card" data-name="奶油风落地灯" data-price="320" data-size="H 1.6m" data-emoji="🪔" data-category="灯具" data-style="奶油风" data-source="AI 生成" data-color="米白">
             <div class="thumb" style="background:linear-gradient(135deg,#FCE3D5,#F2D89A);">🪔</div>
             <div class="info">
               <div class="name">奶油风落地灯</div>
@@ -366,7 +381,7 @@
             </div>
           </div>
 
-          <div class="furniture-card" data-name="绿植·琴叶榕" data-price="280" data-size="H 1.5m" data-emoji="🪴">
+          <div class="furniture-card" data-name="绿植·琴叶榕" data-price="280" data-size="H 1.5m" data-emoji="🪴" data-category="装饰" data-style="现代简约" data-source="系统库" data-color="绿色">
             <div class="thumb" style="background:linear-gradient(135deg,#E2F2DE,#A4D2A2);">🪴</div>
             <div class="info">
               <div class="name">琴叶榕</div>
@@ -402,15 +417,153 @@
   <script>
     document.getElementById('topbar').innerHTML = AnxinHome.renderTopbar('furniture');
 
-    // Source tabs
+    // ========== 筛选状态 ==========
+    let activeSource = '全部';
+    let activeColor = null;
+    let searchTerm = '';
+
+    function getCheckedValues(selector) {
+      return Array.from(document.querySelectorAll(selector + ':checked')).map(el => el.value);
+    }
+
+    function getCheckedRadio(name) {
+      const radio = document.querySelector(`input[name="${name}"]:checked`);
+      return radio ? radio.value : null;
+    }
+
+    // ========== 筛选主函数 ==========
+    function filterFurniture() {
+      const selectedCategories = getCheckedValues('.filter-category');
+      const selectedStyles = getCheckedValues('.filter-style');
+      const priceRange = getCheckedRadio('price');
+
+      document.querySelectorAll('.furniture-card').forEach(card => {
+        let show = true;
+
+        // 来源标签
+        if (activeSource !== '全部' && card.dataset.source !== activeSource) {
+          show = false;
+        }
+
+        // 家具类型（OR 逻辑）
+        if (show && selectedCategories.length > 0) {
+          if (!selectedCategories.includes(card.dataset.category)) {
+            show = false;
+          }
+        }
+
+        // 风格（OR 逻辑）
+        if (show && selectedStyles.length > 0) {
+          if (!selectedStyles.includes(card.dataset.style)) {
+            show = false;
+          }
+        }
+
+        // 主色调
+        if (show && activeColor && card.dataset.color !== activeColor) {
+          show = false;
+        }
+
+        // 价格区间
+        if (show && priceRange) {
+          const price = Number(card.dataset.price);
+          if (priceRange === 'custom') {
+            const lo = Number(document.getElementById('price-min').value) || 0;
+            const hi = Number(document.getElementById('price-max').value) || Infinity;
+            if (price < lo || price > hi) {
+              show = false;
+            }
+          } else {
+            const [lo, hi] = priceRange.split(',').map(Number);
+            if (price < lo || price > hi) {
+              show = false;
+            }
+          }
+        }
+
+        // 搜索
+        if (show && searchTerm) {
+          const name = card.dataset.name.toLowerCase();
+          if (!name.includes(searchTerm.toLowerCase())) {
+            show = false;
+          }
+        }
+
+        card.style.display = show ? '' : 'none';
+      });
+    }
+
+    // ========== 来源标签 ==========
     document.querySelectorAll('.source-tab').forEach(t => {
       t.onclick = () => {
         document.querySelectorAll('.source-tab').forEach(x => x.classList.remove('active'));
         t.classList.add('active');
+        activeSource = t.textContent.replace(/^[^\s]+\s*/, '').trim();
+        filterFurniture();
       };
     });
 
-    // Furniture card → drawer
+    // ========== 筛选 checkbox ==========
+    document.querySelectorAll('.filter-category, .filter-style').forEach(cb => {
+      cb.addEventListener('change', filterFurniture);
+    });
+
+    // ========== 价格 radio ==========
+    const customPrice = document.getElementById('custom-price');
+    document.querySelectorAll('input[name="price"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        customPrice.style.display = radio.value === 'custom' ? 'flex' : 'none';
+        filterFurniture();
+      });
+    });
+    // 自定义价格输入框
+    document.getElementById('price-min').addEventListener('input', filterFurniture);
+    document.getElementById('price-max').addEventListener('input', filterFurniture);
+
+    // ========== 搜索框（防抖 200ms） ==========
+    let searchTimer;
+    document.querySelector('.search-box input').addEventListener('input', function () {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        searchTerm = this.value.trim();
+        filterFurniture();
+      }, 200);
+    });
+
+    // ========== 主色调色块 ==========
+    document.querySelectorAll('.color-swatch').forEach(swatch => {
+      swatch.addEventListener('click', () => {
+        if (swatch.classList.contains('selected')) {
+          swatch.classList.remove('selected');
+          activeColor = null;
+        } else {
+          document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+          swatch.classList.add('selected');
+          activeColor = swatch.dataset.color;
+        }
+        filterFurniture();
+      });
+    });
+
+    // ========== 清空筛选 ==========
+    document.querySelector('.btn-ghost.btn-block.btn-sm').addEventListener('click', () => {
+      document.querySelectorAll('.filter-category, .filter-style').forEach(cb => { cb.checked = true; });
+      document.querySelector('input[name="price"][value="0,999999"]').checked = true;
+      customPrice.style.display = 'none';
+      document.getElementById('price-min').value = '';
+      document.getElementById('price-max').value = '';
+      document.querySelectorAll('.source-tab').forEach((t, i) => {
+        t.classList.toggle('active', i === 0);
+      });
+      activeSource = '全部';
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+      activeColor = null;
+      document.querySelector('.search-box input').value = '';
+      searchTerm = '';
+      filterFurniture();
+    });
+
+    // ========== Card → Drawer ==========
     const drawer = document.getElementById('drawer');
     const backdrop = document.getElementById('drawer-backdrop');
 
@@ -424,7 +577,6 @@
         document.getElementById('drawer-title').textContent = name;
         document.getElementById('drawer-body').innerHTML = `
           <div class="drawer-thumb"></div>
-          
 
           <div class="prop-row" style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--color-line);">
             <span style="color:var(--color-mute);font-size:13px;">参考价</span>
@@ -458,19 +610,15 @@
             · 靠墙摆放建议留 10cm 散热距离
           </div>
         `;
-        
-          // ==============================================
-          // ✅ 这是关键：让详情页显示和列表一样的 3D 图
-          // ==============================================
-          const thumb = document.querySelector('.drawer-thumb');
-          thumb.style.background = 'none';
-          thumb.style.backgroundSize = 'cover';
-          thumb.style.backgroundPosition = 'center';
-          thumb.style.backgroundRepeat = 'no-repeat';
 
-          // 直接用卡片上已经有的图片！
-          const cardThumbStyle = window.getComputedStyle(card.querySelector('.thumb')).backgroundImage;
-          thumb.style.backgroundImage = cardThumbStyle;
+        const thumb = document.querySelector('.drawer-thumb');
+        thumb.style.background = 'none';
+        thumb.style.backgroundSize = 'cover';
+        thumb.style.backgroundPosition = 'center';
+        thumb.style.backgroundRepeat = 'no-repeat';
+
+        const cardThumbStyle = window.getComputedStyle(card.querySelector('.thumb')).backgroundImage;
+        thumb.style.backgroundImage = cardThumbStyle;
 
         drawer.classList.add('open');
         backdrop.classList.add('open');
@@ -488,6 +636,9 @@
       closeDrawer();
       AnxinHome.toast({ type: 'success', title: '✨ 已添加到方案', msg: '这件家具已放入当前方案的「客厅」空间。' });
     };
+
+    // ========== 初始化：默认勾选所有类型 & 风格 ==========
+    filterFurniture();
   </script>
 </body>
 </html>
