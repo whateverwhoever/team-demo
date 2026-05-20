@@ -226,12 +226,17 @@
             <button class="active">3D 视角</button>
             <button>2D 俯视</button>
             <button>📐 标尺</button>
+            <button class="pro-only" style="display:none;">🔲 网格吸附</button>
           </div>
           <div class="toolbar-group">
             <button>↶ 撤销</button>
             <button>↷ 重做</button>
+            <button class="pro-only" style="display:none;">📋 历史版本</button>
           </div>
-          <div style="margin-left:auto;" class="tiny muted">📍 当前:<b style="color:var(--color-deep);">主卧 · 局部改造</b></div>
+          <div style="margin-left:auto;" class="tiny muted">
+            <span class="novice-label">📍 当前:<b style="color:var(--color-deep);">主卧 · 局部改造</b></span>
+            <span class="pro-label" style="display:none;">📍 当前:<b style="color:var(--color-deep);">主卧 · 局部改造</b> · 坐标锁定</span>
+          </div>
         </div>
 
         <div class="room-stage">
@@ -327,6 +332,13 @@
     document.getElementById('topbar').innerHTML = AnxinHome.renderTopbar('workspace');
     document.getElementById('progress').innerHTML = AnxinHome.renderProgress('refinement');
 
+    // Pro mode UI
+    if (AnxinHome.isPro()) {
+      document.querySelectorAll('.pro-only').forEach(el => el.style.display = '');
+      document.querySelectorAll('.novice-label').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.pro-label').forEach(el => el.style.display = '');
+    }
+
     const chat = document.getElementById('chat');
     const property = document.getElementById('property');
 
@@ -388,9 +400,16 @@
     function renderProperty(id) {
       const data = furnitureProps[id];
       if (!data) return;
+      const isPro = AnxinHome.isPro();
       property.innerHTML = `
         <h4>${data.icon} ${data.name}(已选中)</h4>
         ${data.rows.map(([l, v]) => `<div class="prop-row"><span class="lbl">${l}</span><span class="val">${v}</span></div>`).join('')}
+        ${isPro ? `
+        <div class="divider" style="margin:10px 0;"></div>
+        <div class="prop-row"><span class="lbl">X 坐标</span><input type="number" value="0.00" step="0.01" style="width:72px;text-align:right;border:1px solid var(--color-line);border-radius:6px;padding:3px 6px;font-size:12px;"> m</div>
+        <div class="prop-row"><span class="lbl">Y 坐标</span><input type="number" value="0.00" step="0.01" style="width:72px;text-align:right;border:1px solid var(--color-line);border-radius:6px;padding:3px 6px;font-size:12px;"> m</div>
+        <div class="prop-row"><span class="lbl">旋转</span><input type="number" value="0" step="1" style="width:72px;text-align:right;border:1px solid var(--color-line);border-radius:6px;padding:3px 6px;font-size:12px;"> °</div>
+        ` : ''}
         <div class="prop-row"><span class="lbl">颜色</span>
           <div class="color-swatches">
             ${data.colors.map((c, i) => `<div class="swatch-btn ${i === 0 ? 'active' : ''}" style="background:${c};${c === '#FFFFFF' ? 'border:1px solid var(--color-line);' : ''}"></div>`).join('')}
@@ -400,6 +419,12 @@
           <button class="btn btn-ghost btn-sm flex-1">🔄 换款</button>
           <button class="btn btn-soft btn-sm flex-1">📷 上传现货</button>
         </div>
+        ${isPro ? `
+        <div class="flex gap-2 mt-2">
+          <button class="btn btn-ghost btn-sm flex-1" style="font-size:11px;">📋 应用到同款</button>
+          <button class="btn btn-soft btn-sm flex-1" style="font-size:11px;">💾 保存为预设</button>
+        </div>
+        ` : ''}
       `;
     }
 

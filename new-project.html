@@ -235,14 +235,20 @@
     };
 
     // Step 2
+    let selectedMode = 'novice';
     document.querySelectorAll('[data-step="2"] .choice-card').forEach(card => {
       card.onclick = () => {
         document.querySelectorAll('[data-step="2"] .choice-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
+        selectedMode = card.dataset.value;
       };
     });
     document.getElementById('back-2').onclick = () => showStep(1);
-    document.getElementById('next-2').onclick = () => { updateStep3(); showStep(3); };
+    document.getElementById('next-2').onclick = () => {
+      AnxinHome.setMode(selectedMode);
+      updateStep3();
+      showStep(3);
+    };
 
     // Step 3 dynamic content based on type
     function updateStep3() {

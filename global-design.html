@@ -157,7 +157,13 @@
             <button id="btn-dusk">🌆 黄昏</button>
             <button id="btn-night">🌙 夜晚</button>
           </div>
-          <div style="margin-left:auto;" class="tiny muted">⏱️ 方案 v1 · 生成于 2 分钟前</div>
+          <div class="toolbar-group pro-only" style="display:none;">
+            <button id="btn-compare">🖼️ 方案对比</button>
+          </div>
+          <div style="margin-left:auto;" class="tiny muted">
+            <span class="novice-label">⏱️ 方案 v1 · 生成于 2 分钟前</span>
+            <span class="pro-label" style="display:none;">⏱️ 方案 v1 · 高精度渲染 · 约 60s</span>
+          </div>
         </div>
 
         <div class="render-stage" id="render-stage">
@@ -215,6 +221,27 @@
               <a href="refinement.html" class="btn btn-primary btn-sm">进入局部微调 →</a>
             </div>
           </div>
+        </div>
+
+        <!-- Pro: multi-scheme comparison -->
+        <div class="compare-panel" id="compare-panel" style="display:none;position:absolute;inset:0;z-index:20;background:var(--color-bg);padding:12px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;height:100%;">
+            <div class="compare-card" style="background:var(--color-surface);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-card);cursor:pointer;position:relative;" onclick="AnxinHome.toast({type:'info',title:'方案 A · 奶油风',msg:'已切换为方案 A'});document.getElementById('compare-panel').style.display='none';">
+              <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#F5DCC0,#E8C09A);display:flex;align-items:center;justify-content:center;font-size:56px;">🛋️</div>
+              <div style="padding:10px 12px;"><div style="font-weight:700;font-size:13px;color:var(--color-deep);">方案 A · 奶油风</div><div class="tiny muted">暖色调 · 偏明亮 · 舒适档</div></div>
+              <span style="position:absolute;top:8px;left:8px;background:var(--color-primary);color:white;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:600;">当前</span>
+            </div>
+            <div class="compare-card" style="background:var(--color-surface);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-card);cursor:pointer;position:relative;" onclick="AnxinHome.toast({type:'info',title:'方案 B · 现代简约',msg:'已切换为方案 B · 重新渲染中...',duration:4000});document.getElementById('compare-panel').style.display='none';">
+              <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#DDE8F0,#B8CDD9);display:flex;align-items:center;justify-content:center;font-size:56px;">🪑</div>
+              <div style="padding:10px 12px;"><div style="font-weight:700;font-size:13px;color:var(--color-deep);">方案 B · 现代简约</div><div class="tiny muted">冷色调 · 偏明亮 · 轻奢档</div></div>
+            </div>
+            <div class="compare-card" style="background:var(--color-surface);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-card);cursor:pointer;position:relative;" onclick="AnxinHome.toast({type:'info',title:'方案 C · 日式',msg:'已切换为方案 C · 重新渲染中...',duration:4000});document.getElementById('compare-panel').style.display='none';">
+              <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#E8DCC8,#C9B498);display:flex;align-items:center;justify-content:center;font-size:56px;">🪵</div>
+              <div style="padding:10px 12px;"><div style="font-weight:700;font-size:13px;color:var(--color-deep);">方案 C · 日式</div><div class="tiny muted">暖色调 · 偏暗沉 · 舒适档</div></div>
+              <span style="position:absolute;top:8px;right:8px;background:var(--color-warn);color:white;padding:3px 8px;border-radius:999px;font-size:10px;">AI 生成</span>
+            </div>
+          </div>
+          <button style="position:absolute;top:8px;right:12px;background:var(--color-deep);color:white;padding:6px 12px;border-radius:999px;font-size:11px;cursor:pointer;" onclick="document.getElementById('compare-panel').style.display='none';">✕ 关闭对比</button>
         </div>
 
         <div class="legend">
@@ -299,6 +326,17 @@
   <script>
     document.getElementById('topbar').innerHTML = AnxinHome.renderTopbar('workspace');
     document.getElementById('progress').innerHTML = AnxinHome.renderProgress('global');
+
+    // Pro mode UI
+    if (AnxinHome.isPro()) {
+      document.querySelectorAll('.pro-only').forEach(el => el.style.display = '');
+      document.querySelectorAll('.novice-label').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.pro-label').forEach(el => el.style.display = '');
+      // Comparison panel toggle
+      document.getElementById('btn-compare').onclick = () => {
+        document.getElementById('compare-panel').style.display = 'block';
+      };
+    }
 
     const chat = document.getElementById('chat');
     const script = window.AnxinChatScripts.global;
