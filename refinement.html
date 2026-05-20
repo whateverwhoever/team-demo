@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>局部微调 · 安心家</title>
-  <link rel="icon" type="image/svg+xml" href="assets/logo.png">
   <link rel="stylesheet" href="css/tokens.css">
   <style>
     .room-stage {
@@ -11,70 +10,85 @@
       position: relative;
       border-radius: 14px;
       overflow: hidden;
-      background: linear-gradient(180deg, #F5E5D3 0%, #E8C9A8 100%);
       box-shadow: var(--shadow-card);
+      background: #1a1a1a;
     }
-    .room-scene {
+
+    /* 背景渲染图 */
+    .room-bg {
       position: absolute;
       inset: 0;
+      background-size: cover;
+      background-position: center;
+      transition: opacity 0.5s ease;
+      z-index: 0;
+    }
+    .room-bg.master-bedroom { background-image: url('assets/renders/master_bedroom.jpg'); }
+    .room-bg.living-room    { background-image: url('assets/renders/living_room.jpg'); }
+    .room-bg.children-room  { background-image: url('assets/renders/children_room.jpg'); }
+    .room-bg.kitchen        { background-image: url('assets/renders/kitchen.jpg'); }
+
+    /* 非主卧房间的遮罩提示 */
+    .room-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(2px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
     }
-    .room-floor {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 40%;
-      background: linear-gradient(180deg, #C9A878 0%, #8A6A4A 100%);
+    .room-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
     }
-    .room-wall {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 40%;
-      background: linear-gradient(180deg, #FBF3EA 0%, #F2DEC8 100%);
+    .room-overlay-card {
+      background: rgba(255,255,255,0.92);
+      border-radius: 16px;
+      padding: 28px 36px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
     }
-    .room-window {
-      position: absolute;
-      top: 18%;
-      right: 12%;
-      width: 130px;
-      height: 110px;
-      background: linear-gradient(180deg, #B8DCEF 0%, #6FA9C9 100%);
-      border: 8px solid #4A3C32;
-      border-radius: 4px;
-      box-shadow: inset 0 0 0 4px #FBF3EA;
+    .room-overlay-card h3 {
+      margin: 0 0 8px;
+      color: var(--color-deep);
+      font-size: 18px;
     }
-    .room-window::before, .room-window::after {
-      content: '';
-      position: absolute;
-      background: #4A3C32;
+    .room-overlay-card p {
+      margin: 0 0 16px;
+      color: var(--color-mute);
+      font-size: 13px;
     }
-    .room-window::before { left: 50%; top: 0; bottom: 0; width: 3px; transform: translateX(-50%); }
-    .room-window::after { top: 50%; left: 0; right: 0; height: 3px; transform: translateY(-50%); }
 
+    /* 可交互家具浮层（仅主卧） */
     .furniture-item {
       position: absolute;
-      cursor: pointer;
-      transition: 0.25s cubic-bezier(.4,1.5,.6,1);
+      cursor: grab;
+      z-index: 3;
+      transition: transform 0.25s cubic-bezier(.4,1.5,.6,1), left 0.6s ease, bottom 0.6s ease, top 0.6s ease, right 0.6s ease;
       user-select: none;
     }
-    .furniture-item .emoji {
-      font-size: 64px;
-      filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.2));
+    .furniture-item:active { cursor: grabbing; }
+    .furniture-item img {
+      display: block;
+      mix-blend-mode: screen;
+      filter: drop-shadow(2px 6px 12px rgba(0,0,0,0.35));
+      pointer-events: none;
+      transition: filter 0.2s;
+    }
+    .furniture-item.selected img {
+      filter: drop-shadow(0 0 8px rgba(232,130,91,0.9)) drop-shadow(2px 6px 12px rgba(0,0,0,0.3));
     }
     .furniture-item.selected {
-      transform: scale(1.1);
-    }
-    .furniture-item.selected .emoji {
-      filter: drop-shadow(0 0 0 var(--color-primary)) drop-shadow(2px 4px 8px rgba(232,130,91,0.5));
+      transform: scale(1.06);
     }
     .furniture-item .name-tag {
       position: absolute;
-      bottom: -28px;
+      bottom: -26px;
       left: 50%;
       transform: translateX(-50%);
       background: var(--color-deep);
@@ -85,11 +99,11 @@
       white-space: nowrap;
       opacity: 0;
       transition: 0.2s;
+      pointer-events: none;
     }
     .furniture-item:hover .name-tag,
-    .furniture-item.selected .name-tag {
-      opacity: 1;
-    }
+    .furniture-item.selected .name-tag { opacity: 1; }
+
     .furniture-item.has-tip::after {
       content: '?';
       position: absolute;
@@ -113,26 +127,39 @@
       50% { transform: translateY(-3px); }
     }
 
+    /* 拖拽时的放置区高亮 */
+    .drop-hint {
+      position: absolute;
+      border: 2px dashed rgba(232,130,91,0.7);
+      border-radius: 10px;
+      background: rgba(232,130,91,0.08);
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .drop-hint.visible { opacity: 1; }
+
+    /* 场景控件 */
     .scene-controls {
       position: absolute;
       top: 16px;
       right: 16px;
       display: flex;
       gap: 8px;
-      z-index: 5;
+      z-index: 10;
     }
-
     .room-tabs {
       position: absolute;
       top: 16px;
       left: 16px;
       display: flex;
       gap: 6px;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.92);
       padding: 4px;
       border-radius: 999px;
       box-shadow: var(--shadow-card);
-      z-index: 5;
+      z-index: 10;
     }
     .room-tab {
       padding: 6px 14px;
@@ -145,6 +172,7 @@
     }
     .room-tab.active { background: var(--color-primary); color: white; }
 
+    /* 右侧属性面板 */
     .property-panel {
       padding: 16px 20px;
       border-bottom: 1px solid var(--color-line);
@@ -163,42 +191,22 @@
     }
     .prop-row .lbl { color: var(--color-mute); }
     .prop-row .val { color: var(--color-deep); font-weight: 500; }
-
-    .color-swatches {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-    }
+    .color-swatches { display: flex; gap: 8px; margin-top: 8px; }
     .swatch-btn {
-      width: 28px;
-      height: 28px;
+      width: 28px; height: 28px;
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid transparent;
       transition: 0.15s;
     }
-    .swatch-btn.active {
-      border-color: var(--color-deep);
-      transform: scale(1.1);
-    }
-
-    .ground-grid {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
-      background-size: 60px 60px;
-      pointer-events: none;
-    }
+    .swatch-btn.active { border-color: var(--color-deep); transform: scale(1.1); }
 
     .complete-btn-floating {
       position: absolute;
       bottom: 20px;
       right: 20px;
-      z-index: 5;
+      z-index: 10;
     }
-
     .tip-badge {
       position: absolute;
       background: var(--color-warn);
@@ -218,6 +226,16 @@
     @keyframes badgeIn {
       from { transform: scale(0.5); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
+    }
+
+    /* 拖拽移动动画 */
+    @keyframes itemMove {
+      0% { transform: scale(1.06) rotate(-2deg); }
+      50% { transform: scale(1.1) rotate(1deg); }
+      100% { transform: scale(1.06) rotate(0deg); }
+    }
+    .furniture-item.moving {
+      animation: itemMove 0.5s ease;
     }
   </style>
 </head>
@@ -242,57 +260,62 @@
           <div style="margin-left:auto;" class="tiny muted">📍 当前:<b style="color:var(--color-deep);">主卧 · 子工作流</b></div>
         </div>
 
-        <div class="room-stage">
-          <div class="room-tabs">
-            <div class="room-tab" data-room="客厅">客厅</div>
-            <div class="room-tab active" data-room="主卧">主卧</div>
-            <div class="room-tab" data-room="儿童房">儿童房</div>
-            <div class="room-tab" data-room="厨房">厨房</div>
+        <div class="room-stage" id="room-stage">
+
+          <!-- 背景渲染图层 -->
+          <div class="room-bg master-bedroom" id="room-bg"></div>
+
+          <!-- 非主卧遮罩 -->
+          <div class="room-overlay" id="room-overlay">
+            <div class="room-overlay-card">
+              <h3 id="overlay-title">客厅</h3>
+              <p>该房间暂未进入微调流程<br>可返回全屋概览后选择进入</p>
+              <button class="btn btn-primary btn-sm" id="overlay-enter">进入该房间微调</button>
+            </div>
           </div>
 
+          <!-- 房间 Tab -->
+          <div class="room-tabs">
+            <div class="room-tab" data-room="客厅" data-bg="living-room">客厅</div>
+            <div class="room-tab active" data-room="主卧" data-bg="master-bedroom">主卧</div>
+            <div class="room-tab" data-room="儿童房" data-bg="children-room">儿童房</div>
+            <div class="room-tab" data-room="厨房" data-bg="kitchen">厨房</div>
+          </div>
+
+          <!-- 场景控件 -->
           <div class="scene-controls">
             <button class="btn btn-ghost btn-sm" style="background:rgba(255,255,255,0.92);" id="back-to-overview">⬅ 返回全屋</button>
             <button class="btn btn-soft btn-sm" id="finish-room">✓ 完成这间</button>
           </div>
 
-          <div class="room-wall"></div>
-          <div class="room-floor"></div>
-          <div class="ground-grid"></div>
-          <div class="room-window"></div>
+          <!-- 可交互摆件（仅在主卧显示） -->
+          <div class="furniture-layer" id="furniture-layer">
 
-          <!-- Furniture -->
-          <div class="furniture-item" id="f-bed" style="bottom:18%;left:30%;">
-            <div class="emoji">🛏️</div>
-            <div class="name-tag">双人床 · 1.8m</div>
+            <!-- 台灯 -->
+            <div class="furniture-item has-tip" id="f-lamp"
+                 style="bottom:12%;left:22%;width:90px;">
+              <img src="assets/furniture/table_lamp.png" width="90" alt="台灯">
+              <div class="name-tag">台灯</div>
+            </div>
+
+            <!-- 装饰画 -->
+            <div class="furniture-item" id="f-painting"
+                 style="top:18%;left:38%;width:110px;">
+              <img src="assets/furniture/wall_painting.png" width="110" alt="装饰画">
+              <div class="name-tag">装饰画</div>
+            </div>
+
           </div>
 
-          <div class="furniture-item has-tip" id="f-wardrobe" style="bottom:25%;left:5%;">
-            <div class="emoji" style="font-size:72px;">🗄️</div>
-            <div class="name-tag">大衣柜 · 4m</div>
-          </div>
-
-          <div class="furniture-item" id="f-nightstand" style="bottom:22%;left:54%;">
-            <div class="emoji" style="font-size:40px;">🪑</div>
-            <div class="name-tag">床头柜</div>
-          </div>
-
-          <div class="furniture-item has-tip" id="f-dresser" style="bottom:20%;right:18%;">
-            <div class="emoji" style="font-size:54px;">🪞</div>
-            <div class="name-tag">梳妆台</div>
-          </div>
-
-          <div class="furniture-item" id="f-lamp" style="top:30%;left:48%;">
-            <div class="emoji" style="font-size:42px;">💡</div>
-            <div class="name-tag">主灯</div>
-          </div>
-
+          <!-- 完成/下一间按钮 -->
           <button class="btn btn-primary complete-btn-floating" id="next-room">
             前往儿童房 →
           </button>
+
         </div>
 
-        <div class="legend">
-          <span>💡 点击家具查看属性 · 点击「?」展开提醒详情</span>
+        <div class="legend" style="display:flex;align-items:center;padding:8px 12px;font-size:12px;gap:8px;">
+          <span>💡 点击摆件查看属性 · 拖拽可移动位置</span>
           <span style="margin-left:auto;color:var(--color-warn);">🟡 已触发 2 条智能提醒</span>
         </div>
       </div>
@@ -304,7 +327,6 @@
           <span>AI 助手 · 主卧子工作流</span>
         </div>
 
-        <!-- Property panel(默认显示当前选中家具) -->
         <div class="property-panel" id="property">
           <h4>🛏️ 双人床(已选中)</h4>
           <div class="prop-row"><span class="lbl">尺寸</span><span class="val">1.8m × 2.0m</span></div>
@@ -327,7 +349,7 @@
         <div class="chat-stream" id="chat" style="max-height:240px;"></div>
 
         <div class="chat-input">
-          <input id="chat-input" placeholder="比如「衣柜挪到南墙」「换深色床头柜」..." />
+          <input id="chat-input" placeholder="比如「台灯挪到床头」「装饰画换位置」..." />
           <button class="chat-send" id="chat-send">▶</button>
         </div>
       </aside>
@@ -343,7 +365,43 @@
     const chat = document.getElementById('chat');
     const property = document.getElementById('property');
 
-    // Initial chat scripts
+    // ============ 房间切换逻辑 ============
+    const roomBg = document.getElementById('room-bg');
+    const roomOverlay = document.getElementById('room-overlay');
+    const overlayTitle = document.getElementById('overlay-title');
+    const furnitureLayer = document.getElementById('furniture-layer');
+
+    document.querySelectorAll('.room-tab').forEach(tab => {
+      tab.onclick = () => {
+        document.querySelectorAll('.room-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        const bg = tab.dataset.bg;
+        const room = tab.dataset.room;
+
+        // 切换背景图
+        roomBg.className = 'room-bg ' + bg;
+
+        if (room === '主卧') {
+          roomOverlay.classList.remove('visible');
+          furnitureLayer.style.display = 'block';
+        } else {
+          overlayTitle.textContent = room;
+          roomOverlay.classList.add('visible');
+          furnitureLayer.style.display = 'none';
+        }
+
+        AnxinHome.toast({ type: 'info', title: `已切换到${room}`, msg: '对话已锁定该空间', duration: 2500 });
+      };
+    });
+
+    document.getElementById('overlay-enter').onclick = () => {
+      const activeRoom = document.querySelector('.room-tab.active').dataset.room;
+      AnxinHome.toast({ type: 'success', title: `进入${activeRoom}微调`, msg: '该空间子工作流即将启动...', duration: 2500 });
+      roomOverlay.classList.remove('visible');
+    };
+
+    // ============ 对话脚本 ============
     const script = window.AnxinChatScripts.bedroom;
     let idx = 0;
     async function playNext() {
@@ -362,53 +420,28 @@
       } else if (step.role === 'options') {
         AnxinHome.appendOptions(chat, step.options, (opt) => {
           AnxinHome.appendBubble(chat, { role: 'user', html: opt.label });
-          // 触发对应的智能提醒演示
-          if (opt.label.includes('衣柜')) triggerWardrobeMove();
+          if (opt.label.includes('台灯') || opt.label.includes('灯')) triggerLampMove();
+          else if (opt.label.includes('装饰画') || opt.label.includes('画')) triggerPaintingTip();
+          else if (opt.label.includes('衣柜')) triggerWardrobeTip();
           else if (opt.label.includes('床头柜')) triggerStyleTip();
         });
       }
     }
     setTimeout(playNext, 500);
 
-    // Furniture properties data
+    // ============ 家具属性数据 ============
     const furnitureProps = {
-      'f-bed': {
-        icon: '🛏️',
-        name: '双人床(1.8m)',
-        rows: [
-          ['尺寸', '1.8m × 2.0m'],
-          ['材质', '实木 / 软包'],
-          ['参考价', '¥ 4,800'],
-        ],
-        colors: ['#E8DCC8', '#C9A878', '#4A3C32', '#FFFFFF'],
-      },
-      'f-wardrobe': {
-        icon: '🗄️',
-        name: '大衣柜(4m)',
-        rows: [
-          ['尺寸', '4.0m × 0.6m × 2.4m'],
-          ['容量', '约 14 立方米'],
-          ['参考价', '¥ 12,000'],
-        ],
-        colors: ['#FBF3EA', '#C9A878', '#4A3C32'],
-      },
-      'f-nightstand': {
-        icon: '🪑',
-        name: '床头柜',
-        rows: [['尺寸', '0.5m × 0.4m'], ['参考价', '¥ 680'], ],
-        colors: ['#E8DCC8', '#C9A878', '#4A3C32'],
-      },
-      'f-dresser': {
-        icon: '🪞',
-        name: '梳妆台',
-        rows: [['尺寸', '1.0m × 0.4m'], ['参考价', '¥ 2,200'], ],
-        colors: ['#E8DCC8', '#FFFFFF', '#C9A878'],
-      },
       'f-lamp': {
         icon: '💡',
-        name: '主灯 · 暖光',
-        rows: [['色温', '3000K'], ['功率', '36W'], ['参考价', '¥ 580'], ],
-        colors: ['#FFE8C8', '#FCE3D5'],
+        name: '台灯',
+        rows: [['色温', '3000K 暖光'], ['尺寸', 'H 55cm'], ['参考价', '¥ 680']],
+        colors: ['#FFE8C8', '#FCE3D5', '#FFFFFF'],
+      },
+      'f-painting': {
+        icon: '🖼️',
+        name: '装饰画',
+        rows: [['尺寸', '60cm × 80cm'], ['材质', '实木框 / 布面'], ['参考价', '¥ 380']],
+        colors: ['#E8DCC8', '#C9A878', '#FFFFFF'],
       },
     };
 
@@ -420,7 +453,7 @@
         ${data.rows.map(([l, v]) => `<div class="prop-row"><span class="lbl">${l}</span><span class="val">${v}</span></div>`).join('')}
         <div class="prop-row"><span class="lbl">颜色</span>
           <div class="color-swatches">
-            ${data.colors.map((c, i) => `<div class="swatch-btn ${i === 0 ? 'active' : ''}" style="background:${c};${c === '#FFFFFF' ? 'border:1px solid var(--color-line);' : ''}"></div>`).join('')}
+            ${data.colors.map((c, i) => `<div class="swatch-btn ${i===0?'active':''}" style="background:${c};${c==='#FFFFFF'?'border:1px solid var(--color-line);':''}"></div>`).join('')}
           </div>
         </div>
         <div class="flex gap-2 mt-3">
@@ -430,98 +463,185 @@
       `;
     }
 
+    // ============ 点击选中家具 ============
     document.querySelectorAll('.furniture-item').forEach(item => {
-      item.onclick = () => {
+      item.onclick = (e) => {
+        if (item._dragging) return;
         document.querySelectorAll('.furniture-item').forEach(i => i.classList.remove('selected'));
         item.classList.add('selected');
         renderProperty(item.id);
-
-        // Trigger tip for furniture with `?`
-        if (item.id === 'f-wardrobe') triggerWardrobeMove();
-        if (item.id === 'f-dresser') triggerDresserTip();
+        if (item.id === 'f-lamp') triggerLampTip();
+        if (item.id === 'f-painting') triggerPaintingTip();
       };
     });
 
-    // ============== 智能提醒触发逻辑 ==============
-    let wardrobeTriggered = false;
-    let dresserTriggered = false;
+    // ============ 拖拽移动逻辑 ============
+    document.querySelectorAll('.furniture-item').forEach(item => {
+      let startX, startY, origLeft, origTop;
+      item._dragging = false;
 
-    function triggerWardrobeMove() {
-      if (wardrobeTriggered) return;
-      wardrobeTriggered = true;
-      // 动画移动衣柜到窗边
-      const wardrobe = document.getElementById('f-wardrobe');
-      wardrobe.style.left = 'auto';
-      wardrobe.style.right = '8%';
-      wardrobe.style.bottom = '28%';
+      item.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        startX = e.clientX;
+        startY = e.clientY;
+        const rect = item.getBoundingClientRect();
+        const stageRect = document.getElementById('room-stage').getBoundingClientRect();
+        origLeft = rect.left - stageRect.left;
+        origTop = rect.top - stageRect.top;
+        item.style.left = origLeft + 'px';
+        item.style.top = origTop + 'px';
+        item.style.bottom = 'auto';
+        item.style.right = 'auto';
+        item.style.transition = 'none';
 
-      setTimeout(() => {
-        AnxinHome.toast({
-          type: 'warn',
-          title: '🌟 主动提醒 · 采光受影响',
-          msg: '衣柜挪到窗边会遮挡 60% 自然光。主卧本身朝北,建议改回原位或换成<b>低柜</b>。',
-          duration: 9000,
-        });
-        // 在画布上加 badge
-        const badge = document.createElement('div');
-        badge.className = 'tip-badge';
-        badge.style.top = '14%';
-        badge.style.right = '32%';
-        badge.innerHTML = '⚠️ 采光受阻';
-        document.querySelector('.room-stage').appendChild(badge);
-      }, 600);
+        const onMove = (e) => {
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+          if (Math.abs(dx) > 3 || Math.abs(dy) > 3) item._dragging = true;
+          item.style.left = (origLeft + dx) + 'px';
+          item.style.top = (origTop + dy) + 'px';
+        };
+        const onUp = (e) => {
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onUp);
+          item.style.transition = '';
+          if (item._dragging) {
+            item.classList.add('moving');
+            setTimeout(() => { item.classList.remove('moving'); item._dragging = false; }, 500);
+            onFurnitureMoved(item);
+          }
+        };
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      });
+    });
+
+    function onFurnitureMoved(item) {
+      const stage = document.getElementById('room-stage');
+      const stageRect = stage.getBoundingClientRect();
+      const itemRect = item.getBoundingClientRect();
+      const cx = itemRect.left + itemRect.width/2 - stageRect.left;
+      const cy = itemRect.top + itemRect.height/2 - stageRect.top;
+      const xPct = cx / stageRect.width;
+      const yPct = cy / stageRect.height;
+
+      if (item.id === 'f-lamp') {
+        if (xPct > 0.6) {
+          triggerLampWindowWarn();
+        } else {
+          AnxinHome.toast({ type: 'success', title: '✅ 台灯已移动', msg: '位置更新成功，暖光范围已重新计算。', duration: 3000 });
+        }
+      }
+      if (item.id === 'f-painting') {
+        AnxinHome.toast({ type: 'info', title: '🖼️ 装饰画已移动', msg: '新位置视觉重心更均衡，与床头背景墙搭配更好。', duration: 3500 });
+      }
+    }
+
+    // ============ 智能提醒触发逻辑 ============
+    let lampWarnTriggered = false;
+    let lampTipTriggered = false;
+    let paintingTipTriggered = false;
+
+    function triggerLampMove() {
+      const lamp = document.getElementById('f-lamp');
+      lamp.style.transition = 'left 0.8s ease, top 0.8s ease';
+      lamp.style.left = '68%';
+      lamp.style.top = '55%';
+      lamp.style.bottom = 'auto';
+      setTimeout(() => triggerLampWindowWarn(), 850);
+    }
+
+    function triggerLampWindowWarn() {
+      if (lampWarnTriggered) return;
+      lampWarnTriggered = true;
+      AnxinHome.toast({
+        type: 'warn',
+        title: '🌟 主动提醒 · 台灯位置',
+        msg: '台灯靠近窗边后，白天与自然光叠加会产生眩光，夜间光源偏向一侧。建议放在<b>床头两侧</b>，阅读更舒适。',
+        duration: 9000,
+      });
+      const badge = document.createElement('div');
+      badge.className = 'tip-badge';
+      badge.style.top = '12%';
+      badge.style.right = '28%';
+      badge.innerHTML = '⚠️ 眩光风险';
+      document.getElementById('room-stage').appendChild(badge);
+    }
+
+    function triggerLampTip() {
+      if (lampTipTriggered) return;
+      lampTipTriggered = true;
+      AnxinHome.toast({
+        type: 'info',
+        title: '💡 台灯选购建议',
+        msg: '主卧台灯建议选 <b>3000K 暖光</b>，色温过高影响入睡。高度以坐在床上视线不直视灯泡为宜（约55-65cm）。',
+        duration: 7000,
+      });
+    }
+
+    function triggerPaintingTip() {
+      if (paintingTipTriggered) return;
+      paintingTipTriggered = true;
+      AnxinHome.toast({
+        type: 'info',
+        title: '🖼️ 装饰画摆放建议',
+        msg: '装饰画挂高建议<b>画面中心距地 145–160cm</b>（视线自然落点）。主卧背景墙尺寸有限，建议选竖版或一大一小组合。',
+        duration: 8000,
+      });
+    }
+
+    function triggerWardrobeTip() {
+      AnxinHome.toast({
+        type: 'warn',
+        title: '🌟 主动提醒 · 采光受影响',
+        msg: '衣柜挪到窗边会遮挡 60% 自然光。主卧本身朝北，建议改回原位或换成<b>低柜</b>。',
+        duration: 9000,
+      });
     }
 
     function triggerStyleTip() {
       AnxinHome.toast({
         type: 'info',
         title: '💡 选品提示 · 床头柜搭配',
-        msg: '床头柜建议选<b>带抽屉款</b>:夜起拿东西不用开灯;高度与床垫齐平 ± 5cm 最舒适。',
+        msg: '床头柜建议选<b>带抽屉款</b>：夜起拿东西不用开灯；高度与床垫齐平 ±5cm 最舒适。',
         duration: 8000,
       });
     }
 
-    function triggerDresserTip() {
-      if (dresserTriggered) return;
-      dresserTriggered = true;
-      AnxinHome.toast({
-        type: 'warn',
-        title: '🌟 家务死角提醒',
-        msg: '梳妆台与墙之间留了 3cm 缝隙,扫地机器人进不去,长期会积灰。建议<b>紧贴墙</b>或<b>留 30cm 以上</b>。',
-        duration: 8000,
-      });
-    }
-
-    // 完成本间 → Checklist
+    // ============ 完成本间 → Checklist ============
     document.getElementById('finish-room').onclick = () => {
       AnxinHome.showChecklist({
         title: '🎉 主卧完成检查清单',
-        sub: '装完改不了的事项,确认一遍再进下一间',
+        sub: '装完改不了的事项，确认一遍再进下一间',
         items: [
-          { title: '✅ 空调位置是否对着床尾吹?', desc: '冷风直吹床尾会影响睡眠,建议偏移 30cm 以上。' },
-          { title: '✅ 床头插座是否够用?', desc: '至少 2 个 USB + 2 个五孔,装完改不了。' },
+          { title: '✅ 空调位置是否对着床尾吹?', desc: '冷风直吹床尾会影响睡眠，建议偏移 30cm 以上。' },
+          { title: '✅ 床头插座是否够用?', desc: '至少 2 个 USB + 2 个五孔，装完改不了。' },
           { title: '✅ 衣柜与墙之间是否留够清洁空间?', desc: '建议紧贴或留 30cm 以上。' },
-          { title: '✅ 主灯是否避开了床正上方?', desc: '风水忌讳之外,长期视角不舒适。' },
+          { title: '✅ 主灯是否避开了床正上方?', desc: '风水忌讳之外，长期视角不舒适。' },
         ],
       });
     };
 
-    // 下一间房
     document.getElementById('next-room').onclick = () => {
       AnxinHome.toast({ type: 'info', title: '切换中', msg: '即将进入儿童房子工作流...', duration: 2000 });
       setTimeout(() => {
         document.querySelectorAll('.room-tab').forEach(t => t.classList.remove('active'));
-        document.querySelector('[data-room="儿童房"]').classList.add('active');
+        const childTab = document.querySelector('[data-room="儿童房"]');
+        childTab.classList.add('active');
+        roomBg.className = 'room-bg children-room';
+        furnitureLayer.style.display = 'none';
+        overlayTitle.textContent = '儿童房';
+        roomOverlay.classList.add('visible');
         AnxinHome.toast({ type: 'success', title: '已切换到儿童房', msg: '右侧对话框已锁定到该空间。' });
       }, 800);
     };
 
     document.getElementById('back-to-overview').onclick = () => {
-      AnxinHome.toast({ type: 'info', title: '返回全屋视角', msg: '可点击其他房间继续微调,或前往成品交付。' });
+      AnxinHome.toast({ type: 'info', title: '返回全屋视角', msg: '可点击其他房间继续微调，或前往成品交付。' });
       setTimeout(() => { window.location.href = 'delivery.html'; }, 1200);
     };
 
-    // Chat send
+    // ============ 对话框发送 ============
     document.getElementById('chat-send').onclick = () => {
       const v = document.getElementById('chat-input').value.trim();
       if (!v) return;
@@ -531,20 +651,23 @@
         const typing = AnxinHome.appendBubble(chat, { role: 'ai', withTyping: true });
         setTimeout(() => {
           typing.remove();
-          AnxinHome.appendBubble(chat, { role: 'ai', html: '收到,我来调整下 ✅' });
-          if (v.includes('衣柜')) triggerWardrobeMove();
-          else if (v.includes('梳妆')) triggerDresserTip();
+          AnxinHome.appendBubble(chat, { role: 'ai', html: '收到，我来调整下 ✅' });
+          if (v.includes('台灯') || v.includes('灯')) triggerLampMove();
+          else if (v.includes('装饰画') || v.includes('画')) triggerPaintingTip();
+          else if (v.includes('衣柜')) triggerWardrobeTip();
+          else if (v.includes('梳妆')) {
+            AnxinHome.toast({
+              type: 'warn', title: '🌟 家务死角提醒',
+              msg: '梳妆台与墙之间留了 3cm 缝隙，扫地机器人进不去，长期会积灰。建议<b>紧贴墙</b>或<b>留 30cm 以上</b>。',
+              duration: 8000,
+            });
+          }
         }, 900);
       }, 200);
     };
 
-    // 房间 tab 切换
-    document.querySelectorAll('.room-tab').forEach(t => {
-      t.onclick = () => {
-        document.querySelectorAll('.room-tab').forEach(x => x.classList.remove('active'));
-        t.classList.add('active');
-        AnxinHome.toast({ type: 'info', title: `已切换到 ${t.dataset.room}`, msg: '对话已锁定该空间', duration: 2500 });
-      };
+    document.getElementById('chat-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('chat-send').click();
     });
   </script>
 </body>
