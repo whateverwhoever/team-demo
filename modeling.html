@@ -90,8 +90,13 @@
           <div class="toolbar-group">
             <button>📐 测距</button>
             <button>🏷️ 改标签</button>
+            <button class="pro-only" style="display:none;">📏 尺寸标注</button>
+            <button class="pro-only" style="display:none;">🔲 网格</button>
           </div>
-          <div style="margin-left:auto;" class="tiny muted">📍 朝阳·首开 96㎡ · 已识别 6 个空间</div>
+          <div style="margin-left:auto;" class="tiny muted">
+            <span class="novice-label">📍 朝阳·首开 96㎡ · 已识别 6 个空间</span>
+            <span class="pro-label" style="display:none;">📍 朝阳·首开 96㎡ · 高精度识别 · 6 个空间</span>
+          </div>
         </div>
 
         <div class="floorplan-container">
@@ -197,6 +202,13 @@
   <script>
     document.getElementById('topbar').innerHTML = AnxinHome.renderTopbar('workspace');
     document.getElementById('progress').innerHTML = AnxinHome.renderProgress('modeling');
+
+    // Pro mode UI
+    if (AnxinHome.isPro()) {
+      document.querySelectorAll('.pro-only').forEach(el => el.style.display = '');
+      document.querySelectorAll('.novice-label').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.pro-label').forEach(el => el.style.display = '');
+    }
 
     const chat = document.getElementById('chat');
     const script = window.AnxinChatScripts.modeling;

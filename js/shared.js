@@ -2,6 +2,23 @@
 
 window.AnxinHome = window.AnxinHome || {};
 
+// ========== Mode detection ==========
+AnxinHome.getMode = function () {
+  return sessionStorage.getItem('anxin_mode') || 'novice';
+};
+AnxinHome.isPro = function () {
+  return AnxinHome.getMode() === 'pro';
+};
+AnxinHome.setMode = function (mode) {
+  sessionStorage.setItem('anxin_mode', mode);
+};
+AnxinHome.modeLabel = function () {
+  return AnxinHome.isPro() ? '⚡ 专业模式' : '🌱 小白模式';
+};
+AnxinHome.modeTagClass = function () {
+  return AnxinHome.isPro() ? 'tag-pro' : 'tag-novice';
+};
+
 // ========== Topbar ==========
 AnxinHome.renderTopbar = function (activeNav) {
   const navs = [
@@ -22,6 +39,7 @@ AnxinHome.renderTopbar = function (activeNav) {
         ${navs.map(n => `<a href="${n.href}" class="${n.key === activeNav ? 'active' : ''}">${n.label}</a>`).join('')}
       </nav>
       <div class="right">
+        <span class="mode-badge ${AnxinHome.modeTagClass()}">${AnxinHome.modeLabel()}</span>
         <button class="btn btn-ghost btn-sm">📤 分享</button>
         <button class="btn btn-soft btn-sm">💾 保存</button>
         <div class="avatar">林</div>
@@ -32,20 +50,23 @@ AnxinHome.renderTopbar = function (activeNav) {
 
 // ========== Workflow Progress ==========
 AnxinHome.renderProgress = function (currentStep) {
+  const isPartial = window.location.href.includes('partial-');
+  const prefix = isPartial ? 'partial-' : '';
   const steps = [
-    { key: 'modeling', label: '基础建模', href: 'modeling.html' },
-    { key: 'global', label: '整体设计', href: 'global-design.html' },
-    { key: 'refinement', label: '局部微调', href: 'refinement.html' },
-    { key: 'delivery', label: '成品交付', href: 'delivery.html' },
+    { key: 'modeling', label: '基础建模', href: prefix + 'modeling.html' },
+    { key: 'global', label: '整体设计', href: prefix + 'global-design.html' },
+    { key: 'refinement', label: '局部微调', href: prefix + 'refinement.html' },
+    { key: 'delivery', label: '成品交付', href: prefix + 'delivery.html' },
   ];
   const currentIdx = steps.findIndex(s => s.key === currentStep);
+  const modeParam = AnxinHome.isPro() ? '?mode=pro' : '';
   return `
     <div class="workflow-progress">
       ${steps.map((s, i) => {
         const cls = i < currentIdx ? 'done' : i === currentIdx ? 'active' : '';
         const dotContent = i < currentIdx ? '✓' : (i + 1);
         const stepHtml = `
-          <a href="${s.href}" class="workflow-step ${cls}">
+          <a href="${s.href}${modeParam}" class="workflow-step ${cls}">
             <div class="dot">${dotContent}</div>
             <span>${s.label}</span>
           </a>
@@ -61,6 +82,8 @@ AnxinHome.renderProgress = function (currentStep) {
 
 // ========== Toast ==========
 AnxinHome.toast = function ({ type = 'warn', title, msg, duration = 5500 }) {
+  // Pro mode: suppress info-level reminders (keep warn/danger/success)
+  if (AnxinHome.isPro() && type === 'info') return;
   let container = document.querySelector('.toast-container');
   if (!container) {
     container = document.createElement('div');

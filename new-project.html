@@ -167,13 +167,13 @@
 
         <!-- STEP 3 -->
         <div class="step-content" data-step="3">
-          <h2 style="margin:0 0 6px;color:var(--color-deep);font-size:22px;">上传你的户型图</h2>
-          <p class="muted" style="margin:0;">原始结构图最准。JPG / PNG / PDF 都可以。</p>
+          <h2 style="margin:0 0 6px;color:var(--color-deep);font-size:22px;" id="step3-title">上传你的户型图</h2>
+          <p class="muted" style="margin:0;" id="step3-desc">原始结构图最准。JPG / PNG / PDF 都可以。</p>
 
           <div class="upload-zone" id="upload-zone">
-            <div style="font-size:48px;color:var(--color-primary);margin-bottom:10px;">⬆</div>
-            <div style="font-weight:600;color:var(--color-deep);margin-bottom:4px;">拖拽户型图到这里,或点击上传</div>
-            <div class="tiny muted">支持 JPG / PNG / PDF · 单个文件 ≤ 10MB</div>
+            <div id="step3-upload-icon" style="font-size:48px;color:var(--color-primary);margin-bottom:10px;">⬆</div>
+            <div style="font-weight:600;color:var(--color-deep);margin-bottom:4px;" id="step3-upload-text">拖拽户型图到这里,或点击上传</div>
+            <div class="tiny muted" id="step3-upload-hint">支持 JPG / PNG / PDF · 单个文件 ≤ 10MB</div>
           </div>
 
           <div class="center">
@@ -186,7 +186,7 @@
             <div style="font-size:22px;">💡</div>
             <div>
               <div style="font-weight:600;color:var(--color-deep);font-size:13px;margin-bottom:4px;">小贴士</div>
-              <div class="tiny muted">户型图识别约 80% 准确率,3D 建模后会让你<b>手动确认</b>每个房间标签,识别错了一键就能改。</div>
+              <div class="tiny muted" id="step3-tip">户型图识别约 80% 准确率,3D 建模后会让你<b>手动确认</b>每个房间标签,识别错了一键就能改。</div>
             </div>
           </div>
 
@@ -218,38 +218,70 @@
     };
 
     // Step 1: type selection
+    let selectedType = null;
     document.querySelectorAll('[data-step="1"] .choice-card').forEach(card => {
       card.onclick = () => {
         document.querySelectorAll('[data-step="1"] .choice-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
+        selectedType = card.dataset.value;
         const btn = document.getElementById('next-1');
         btn.disabled = false;
         btn.style.opacity = '1';
       };
     });
-    document.getElementById('next-1').onclick = () => showStep(2);
+    document.getElementById('next-1').onclick = () => {
+      updateStep3();
+      showStep(2);
+    };
 
     // Step 2
+    let selectedMode = 'novice';
     document.querySelectorAll('[data-step="2"] .choice-card').forEach(card => {
       card.onclick = () => {
         document.querySelectorAll('[data-step="2"] .choice-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
+        selectedMode = card.dataset.value;
       };
     });
     document.getElementById('back-2').onclick = () => showStep(1);
-    document.getElementById('next-2').onclick = () => showStep(3);
+    document.getElementById('next-2').onclick = () => {
+      AnxinHome.setMode(selectedMode);
+      updateStep3();
+      showStep(3);
+    };
+
+    // Step 3 dynamic content based on type
+    function updateStep3() {
+      const isPartial = selectedType === 'partial';
+      document.getElementById('step3-title').textContent = isPartial ? '扫描你的房间' : '上传你的户型图';
+      document.getElementById('step3-desc').textContent = isPartial ? '用手机扫描房间,自动生成 3D 模型。' : '原始结构图最准。JPG / PNG / PDF 都可以。';
+      document.getElementById('step3-tip').innerHTML = isPartial ? '上传房间照片后 AI 会<b>自动清除杂物和现有家具</b>,给你一个干净的空间骨架来重新规划。' : '户型图识别约 80% 准确率,3D 建模后会让你<b>手动确认</b>每个房间标签,识别错了一键就能改。';
+      document.getElementById('use-demo').textContent = isPartial ? '没有照片?使用 demo 主卧一键体验 →' : '没有户型图?使用 demo 户型一键体验 →';
+      document.getElementById('start-design').href = isPartial ? 'partial-modeling.html' : 'modeling.html';
+      // Reset upload zone
+      const zone = document.getElementById('upload-zone');
+      zone.classList.remove('has-file');
+      zone.innerHTML = `
+        <div style="font-size:48px;color:var(--color-primary);margin-bottom:10px;">${isPartial ? '📷' : '⬆'}</div>
+        <div style="font-weight:600;color:var(--color-deep);margin-bottom:4px;">${isPartial ? '拖拽房间照片到这里,或点击上传' : '拖拽户型图到这里,或点击上传'}</div>
+        <div class="tiny muted">${isPartial ? '支持多角度照片 · 建议光线充足' : '支持 JPG / PNG / PDF · 单个文件 ≤ 10MB'}</div>
+      `;
+    }
 
     // Step 3
     document.getElementById('back-3').onclick = () => showStep(2);
     document.getElementById('use-demo').onclick = () => {
+      const isPartial = selectedType === 'partial';
       const zone = document.getElementById('upload-zone');
       zone.classList.add('has-file');
-      zone.innerHTML = `
-        <div style="font-size:36px;color:var(--color-success);margin-bottom:10px;">✓</div>
-        <div style="font-weight:600;color:var(--color-deep);">已加载 demo 户型:朝阳·首开 96㎡</div>
-        <div class="tiny muted">3 室 1 厅 1 卫 · JPG 格式</div>
-      `;
-      AnxinHome.toast({ type: 'success', title: 'Demo 户型加载完成', msg: '点击「开始设计」进入建模阶段。' });
+      zone.innerHTML = isPartial
+        ? `<div style="font-size:36px;color:var(--color-success);margin-bottom:10px;">✓</div>
+           <div style="font-weight:600;color:var(--color-deep);">已加载 demo 主卧扫描数据</div>
+           <div class="tiny muted">12.5㎡ · 已识别:双人床、大衣柜、床头柜、梳妆台</div>`
+        : `<div style="font-size:36px;color:var(--color-success);margin-bottom:10px;">✓</div>
+           <div style="font-weight:600;color:var(--color-deep);">已加载 demo 户型:朝阳·首开 96㎡</div>
+           <div class="tiny muted">3 室 1 厅 1 卫 · JPG 格式</div>`;
+      AnxinHome.toast({ type: 'success', title: isPartial ? 'Demo 主卧加载完成' : 'Demo 户型加载完成', msg: isPartial ? '已识别 4 件现有家具,点击「开始设计」进入建模。' : '点击「开始设计」进入建模阶段。' });
     };
   </script>
 </body>
