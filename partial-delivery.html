@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>成品交付 · 局部改造 · 安心家</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="stylesheet" href="css/tokens.css">
+  <style>
+    .delivery-wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 30px 32px 60px;
+      width: 100%;
+    }
+    .summary-bar {
+      background: linear-gradient(135deg, var(--color-primary-soft) 0%, var(--color-accent) 100%);
+      border-radius: 18px;
+      padding: 28px 32px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .summary-bar .ico {
+      width: 56px;
+      height: 56px;
+      background: white;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    .summary-bar .info h3 {
+      margin: 0 0 4px;
+      font-size: 18px;
+      color: var(--color-deep);
+    }
+    .summary-bar .info p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--color-mute);
+    }
+    .delivery-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .delivery-card {
+      background: var(--color-surface);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .delivery-card:hover { box-shadow: var(--shadow-lift); }
+    .delivery-card .card-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+    }
+    .delivery-card h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+      color: var(--color-deep);
+    }
+    .delivery-card p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--color-mute);
+      line-height: 1.5;
+    }
+    .reminder-list {
+      background: var(--color-surface);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+    }
+    .reminder-list h3 {
+      margin: 0 0 16px;
+      font-size: 16px;
+      color: var(--color-deep);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .reminder-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--color-line);
+    }
+    .reminder-item:last-child { border-bottom: none; }
+    .reminder-severity {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+    .reminder-severity.warn { background: var(--color-warn); }
+    .reminder-severity.info { background: var(--color-info); }
+    .bottom-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div id="topbar"></div>
+    <div id="progress"></div>
+
+    <div class="delivery-wrap">
+      <div class="summary-bar">
+        <div class="ico">🛏️</div>
+        <div class="info">
+          <h3>主卧改造方案 · 奶油风</h3>
+          <p>12.5㎡ · 局部改造 · 舒适档 · 预算参考 ¥35,000-58,000</p>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:10px;">
+          <button class="btn btn-soft btn-sm">📤 导出方案</button>
+          <button class="btn btn-primary btn-sm">🔗 分享</button>
+        </div>
+      </div>
+
+      <div class="delivery-grid">
+        <div class="delivery-card" onclick="AnxinHome.toast({type:'info',title:'3D 漫游',msg:'正在加载主卧漫游视图...'})">
+          <div class="card-icon">🎥</div>
+          <h3>3D 房间漫游</h3>
+          <p>在改造后的主卧中自由走动,从门口到窗边,感受实际空间尺度。</p>
+        </div>
+        <div class="delivery-card" onclick="AnxinHome.toast({type:'info',title:'改造前后对比',msg:'左侧:扫描原状 / 右侧:改造方案'})">
+          <div class="card-icon">📸</div>
+          <h3>改造前后对比</h3>
+          <p>左图为扫描原状(含旧家具),右图为改造方案,直观对比变化。</p>
+        </div>
+        <div class="delivery-card" onclick="AnxinHome.toast({type:'info',title:'平面图',msg:'正在生成 2D 平面布置图...'})">
+          <div class="card-icon">📐</div>
+          <h3>2D 平面布置图</h3>
+          <p>标注尺寸的平面图,可直接发给施工队或用来选购家具。</p>
+        </div>
+        <div class="delivery-card" onclick="AnxinHome.toast({type:'info',title:'家具清单',msg:'含新旧替换明细和价格参考'})">
+          <div class="card-icon">📋</div>
+          <h3>家具清单 + 预算参考</h3>
+          <p>含新旧家具替换明细、尺寸、参考价格,方便比价采购。</p>
+        </div>
+      </div>
+
+      <!-- Reminder summary -->
+      <div class="reminder-list">
+        <h3>🌟 智能提醒汇总 <span class="tag tag-warn" style="font-size:11px;">5 条提醒</span></h3>
+        <div class="reminder-item">
+          <div class="reminder-severity warn"></div>
+          <div>
+            <div style="font-weight:600;color:var(--color-deep);font-size:13px;">主卧朝北 · 采光偏弱</div>
+            <div style="color:var(--color-mute);font-size:12px;margin-top:2px;">建议落地灯选 3000K 暖光 + 墙面选奶油白/米白,避免深色和纯白。</div>
+          </div>
+        </div>
+        <div class="reminder-item">
+          <div class="reminder-severity warn"></div>
+          <div>
+            <div style="font-weight:600;color:var(--color-deep);font-size:13px;">床头插座位置</div>
+            <div style="color:var(--color-mute);font-size:12px;margin-top:2px;">床换到东墙后,原插座可能被遮挡。建议确认新位置至少有 2 个五孔 + 2 个 USB。</div>
+          </div>
+        </div>
+        <div class="reminder-item">
+          <div class="reminder-severity info"></div>
+          <div>
+            <div style="font-weight:600;color:var(--color-deep);font-size:13px;">衣柜面板颜色选择</div>
+            <div style="color:var(--color-mute);font-size:12px;margin-top:2px;">浅色面板显空间大,但朝北房间建议选奶油白而非纯白,避免显冷。</div>
+          </div>
+        </div>
+        <div class="reminder-item">
+          <div class="reminder-severity warn"></div>
+          <div>
+            <div style="font-weight:600;color:var(--color-deep);font-size:13px;">阅读角遮光需求</div>
+            <div style="color:var(--color-mute);font-size:12px;margin-top:2px;">阅读角靠窗利用自然光,但需配遮光帘防止阳光直射沙发和书籍褪色。</div>
+          </div>
+        </div>
+        <div class="reminder-item">
+          <div class="reminder-severity info"></div>
+          <div>
+            <div style="font-weight:600;color:var(--color-deep);font-size:13px;">衣柜与墙的清洁缝隙</div>
+            <div style="color:var(--color-mute);font-size:12px;margin-top:2px;">建议衣柜紧贴墙安装,或预留 30cm 以上方便扫地机器人进出。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-actions">
+        <a href="partial-refinement.html" class="btn btn-ghost">← 继续调整</a>
+        <a href="index.html" class="btn btn-primary">回到项目列表</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/shared.js"></script>
+  <script src="js/chat-script.js"></script>
+  <script>
+    document.getElementById('topbar').innerHTML = AnxinHome.renderTopbar('workspace');
+    document.getElementById('progress').innerHTML = AnxinHome.renderProgress('delivery');
+
+    // Pop a success toast on load
+    setTimeout(() => {
+      AnxinHome.toast({
+        type: 'success',
+        title: '🎉 主卧改造方案已完成',
+        msg: '4 个交付物已就绪,5 条智能提醒已汇总。可导出或分享给设计师。',
+        duration: 6000,
+      });
+    }, 800);
+  </script>
+</body>
+</html>
