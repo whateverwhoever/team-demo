@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>家具库 · 安心家</title>
-  <link rel="icon" type="image/svg+xml" href="assets/logo.png">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="stylesheet" href="css/tokens.css">
   <style>
     .furniture-page {
@@ -145,6 +145,12 @@
       margin-bottom: 6px;
     }
 
+    label:has(> .filter-all) {
+      padding-bottom: 8px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid var(--color-line);
+    }
+
     .color-swatch {
       border: 2px solid transparent;
       transition: 0.15s;
@@ -166,7 +172,8 @@
 
         <div class="filter-group">
           <h4>家具类型</h4>
-          <div class="filter-options">
+          <div class="filter-options" data-group="category">
+            <label><input type="checkbox" class="filter-all" data-group="category"> 不限</label>
             <label><input type="checkbox" class="filter-category" value="沙发" checked> 沙发 (24)</label>
             <label><input type="checkbox" class="filter-category" value="床" checked> 床 (18)</label>
             <label><input type="checkbox" class="filter-category" value="衣柜"> 衣柜 (32)</label>
@@ -178,7 +185,8 @@
 
         <div class="filter-group">
           <h4>风格</h4>
-          <div class="filter-options">
+          <div class="filter-options" data-group="style">
+            <label><input type="checkbox" class="filter-all" data-group="style"> 不限</label>
             <label><input type="checkbox" class="filter-style" value="奶油风" checked> 奶油风</label>
             <label><input type="checkbox" class="filter-style" value="北欧"> 北欧</label>
             <label><input type="checkbox" class="filter-style" value="现代简约"> 现代简约</label>
@@ -504,8 +512,26 @@
     });
 
     // ========== 筛选 checkbox ==========
+    document.querySelectorAll('.filter-all').forEach(all => {
+      all.addEventListener('change', function () {
+        if (this.checked) {
+          const group = this.dataset.group;
+          const selector = group === 'category' ? '.filter-category' : '.filter-style';
+          document.querySelectorAll(selector).forEach(cb => { cb.checked = false; });
+        }
+        filterFurniture();
+      });
+    });
+
     document.querySelectorAll('.filter-category, .filter-style').forEach(cb => {
-      cb.addEventListener('change', filterFurniture);
+      cb.addEventListener('change', function () {
+        if (this.checked) {
+          const group = this.classList.contains('filter-category') ? 'category' : 'style';
+          const all = document.querySelector(`.filter-all[data-group="${group}"]`);
+          if (all) all.checked = false;
+        }
+        filterFurniture();
+      });
     });
 
     // ========== 价格 radio ==========
@@ -548,6 +574,7 @@
     // ========== 清空筛选 ==========
     document.querySelector('.btn-ghost.btn-block.btn-sm').addEventListener('click', () => {
       document.querySelectorAll('.filter-category, .filter-style').forEach(cb => { cb.checked = true; });
+      document.querySelectorAll('.filter-all').forEach(cb => { cb.checked = false; });
       document.querySelector('input[name="price"][value="0,999999"]').checked = true;
       customPrice.style.display = 'none';
       document.getElementById('price-min').value = '';
