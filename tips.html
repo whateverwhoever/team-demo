@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>避坑百科 · 安心家</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="stylesheet" href="css/tokens.css">
+  <style>
+    .tips-page {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+    .tips-main {
+      flex: 1;
+      padding: 24px 32px;
+      overflow-y: auto;
+    }
+    .tips-hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .search-box {
+      flex: 1;
+      max-width: 420px;
+      display: flex;
+      align-items: center;
+      background: var(--color-surface);
+      border-radius: var(--radius-pill);
+      padding: 8px 16px;
+      box-shadow: var(--shadow-card);
+      gap: 8px;
+    }
+    .search-box input {
+      flex: 1;
+      border: none;
+      background: none;
+      outline: none;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    /* ===== Filter Sidebar ===== */
+    .filters {
+      width: 220px;
+      padding: 24px;
+      background: var(--color-surface);
+      border-right: 1px solid var(--color-line);
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    .filter-group {
+      margin-bottom: 24px;
+    }
+    .filter-group h4 {
+      font-size: 13px;
+      color: var(--color-deep);
+      margin: 0 0 10px;
+      font-weight: 600;
+    }
+    .filter-options {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .filter-options label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--color-text);
+      cursor: pointer;
+    }
+    label:has(> .filter-all) {
+      padding-bottom: 8px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid var(--color-line);
+    }
+
+    /* ===== Tip Grid ===== */
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .tip-card {
+      background: var(--color-surface);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+      transition: 0.2s;
+      border-left: 4px solid var(--color-warn);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+      position: relative;
+    }
+    .tip-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lift);
+    }
+    .tip-card.danger  { border-left-color: var(--color-danger); }
+    .tip-card.warn    { border-left-color: var(--color-warn); }
+    .tip-card.info    { border-left-color: var(--color-info); }
+    .tip-card.success { border-left-color: var(--color-success); }
+
+    .tip-card .tip-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .tip-card .severity-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .tip-card.danger  .severity-icon { background: var(--color-danger-bg); }
+    .tip-card.warn    .severity-icon { background: var(--color-warn-bg); }
+    .tip-card.info    .severity-icon { background: var(--color-info-bg); }
+    .tip-card.success .severity-icon { background: var(--color-success-bg); }
+
+    .tip-card .tip-stage {
+      font-size: 11px;
+      color: var(--color-mute);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .tip-card .tip-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-deep);
+      line-height: 1.4;
+    }
+    .tip-card .tip-desc {
+      font-size: 12px;
+      color: var(--color-mute);
+      line-height: 1.6;
+      flex: 1;
+    }
+    .tip-card .tip-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tip-card .tip-meta .tag {
+      font-size: 11px;
+    }
+    .tip-card.read {
+      background: var(--color-surface-2);
+    }
+    .tip-card .read-badge {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 10px;
+      color: var(--color-success);
+      font-weight: 600;
+      background: var(--color-success-bg);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+    }
+    .tip-card.read::before {
+      content: '✓ 已阅';
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      font-size: 10px;
+      color: var(--color-success);
+      font-weight: 600;
+    }
+
+    /* ===== Drawer ===== */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(46,37,30,0.4);
+      z-index: 2000;
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+    .drawer-backdrop.open { display: block; }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 460px;
+      max-width: 90vw;
+      height: 100vh;
+      background: var(--color-surface);
+      z-index: 2001;
+      box-shadow: -8px 0 32px rgba(0,0,0,0.12);
+      transform: translateX(100%);
+      transition: 0.3s cubic-bezier(.4,0,.2,1);
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+
+    .drawer-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--color-line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+    .drawer-body .detail-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+    .drawer-body .detail-icon.danger  { background: var(--color-danger-bg); }
+    .drawer-body .detail-icon.warn    { background: var(--color-warn-bg); }
+    .drawer-body .detail-icon.info    { background: var(--color-info-bg); }
+    .drawer-body .detail-icon.success { background: var(--color-success-bg); }
+
+    .drawer-body .detail-section {
+      margin-bottom: 20px;
+    }
+    .drawer-body .detail-section h5 {
+      font-size: 12px;
+      color: var(--color-mute);
+      margin: 0 0 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .drawer-body .detail-section p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--color-text);
+    }
+    .drawer-body .detail-section .highlight-box {
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .drawer-body .detail-section .highlight-box.danger  { background: var(--color-danger-bg); color: #8B3A30; }
+    .drawer-body .detail-section .highlight-box.warn    { background: var(--color-warn-bg); color: #5C4A10; }
+    .drawer-body .detail-section .highlight-box.info    { background: var(--color-info-bg); color: #2E5A7A; }
+    .drawer-body .detail-section .highlight-box.success { background: var(--color-success-bg); color: #3A6E3B; }
+
+    .drawer-body .related-tip {
+      padding: 8px 12px;
+      background: var(--color-surface-2);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--color-mute);
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .drawer-body .related-tip:hover {
+      background: var(--color-primary-soft);
+      color: var(--color-primary-dark);
+    }
+
+    .drawer-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--color-line);
+      display: flex;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div id="topbar"></div>
+
+    <div class="tips-page">
+      <!-- Filter Sidebar -->
+      <aside class="filters">
+        <h3 style="margin:0 0 20px;color:var(--color-deep);font-size:16px;">筛选</h3>
+
+        <div class="filter-group">
+          <h4>装修环节</h4>
+          <div class="filter-options" data-group="stage">
+            <label><input type="checkbox" class="filter-all" data-group="stage"> 不限</label>
+            <label><input type="checkbox" class="filter-stage" value="水电" checked> 水电</label>
+            <label><input type="checkbox" class="filter-stage" value="家具" checked> 家具</label>
+            <label><input type="checkbox" class="filter-stage" value="门窗" checked> 门窗</label>
+            <label><input type="checkbox" class="filter-stage" value="软装" checked> 软装</label>
+            <label><input type="checkbox" class="filter-stage" value="整体" checked> 整体</label>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <h4>严重程度</h4>
+          <div class="filter-options" data-group="severity">
+            <label><input type="checkbox" class="filter-all" data-group="severity"> 不限</label>
+            <label><input type="checkbox" class="filter-severity" value="danger" checked> 🚨 原则性（装完改不了）</label>
+            <label><input type="checkbox" class="filter-severity" value="warn" checked> ⚠️ 建议性（强烈推荐）</label>
+            <label><input type="checkbox" class="filter-severity" value="info" checked> 💡 参考性（锦上添花）</label>
+            <label><input type="checkbox" class="filter-severity" value="success" checked> ✅ 已通过</label>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <h4>房间</h4>
+          <div class="filter-options" data-group="room">
+            <label><input type="checkbox" class="filter-all" data-group="room"> 不限</label>
+            <label><input type="checkbox" class="filter-room" value="全屋" checked> 全屋</label>
+            <label><input type="checkbox" class="filter-room" value="主卧" checked> 主卧</label>
+            <label><input type="checkbox" class="filter-room" value="客厅" checked> 客厅</label>
+            <label><input type="checkbox" class="filter-room" value="儿童房" checked> 儿童房</label>
+            <label><input type="checkbox" class="filter-room" value="厨房" checked> 厨房</label>
+            <label><input type="checkbox" class="filter-room" value="卫生间" checked> 卫生间</label>
+            <label><input type="checkbox" class="filter-room" value="阳台" checked> 阳台</label>
+          </div>
+        </div>
+
+        <button class="btn btn-ghost btn-block btn-sm" id="clear-filters">清空筛选</button>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="tips-main">
+        <div class="tips-hero">
+          <div>
+            <h1 style="margin:0 0 6px;color:var(--color-deep);font-size:24px;">避坑百科</h1>
+            <p class="muted tiny" style="margin:0;">共 <span id="tip-count">21</span> 条 · <span id="read-count">0</span> 条已阅</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button class="btn btn-ghost btn-sm" id="toggle-unread" style="white-space:nowrap;">👁 仅看未阅</button>
+            <div class="search-box">
+              <span>🔍</span>
+              <input placeholder="搜索避坑知识（如「插座」「衣柜」）" />
+            </div>
+          </div>
+        </div>
+
+        <div class="tips-grid" id="tips-grid">
+
+          <!-- ====== 水电 ====== -->
+          <div class="tip-card danger" data-id="bedside-outlets" data-stage="水电" data-severity="danger" data-room="主卧">
+            <div class="tip-header">
+              <div class="severity-icon">🚨</div>
+              <div>
+                <div class="tip-stage">水电阶段</div>
+                <div class="tip-title">床头插座建议增加到 4 个</div>
+              </div>
+            </div>
+            <div class="tip-desc">装完改不了。床两侧各 2 个五孔 + USB 是基础配置，预留充电、阅读灯、加湿器。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">主卧</span>
+              <span class="tag tag-warn">原则性</span>
+            </div>
+          </div>
+
+          <div class="tip-card danger" data-id="projector-outlet" data-stage="水电" data-severity="danger" data-room="客厅">
+            <div class="tip-header">
+              <div class="severity-icon">🚨</div>
+              <div>
+                <div class="tip-stage">水电阶段</div>
+                <div class="tip-title">沙发墙后预留投影/电视插座</div>
+              </div>
+            </div>
+            <div class="tip-desc">即使现在不装投影，布线一次到位，避免日后拆墙重做。建议预埋 HDMI + 网线 + 电源。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">客厅</span>
+              <span class="tag tag-warn">原则性</span>
+            </div>
+          </div>
+
+          <div class="tip-card warn" data-id="kitchen-outlets" data-stage="水电" data-severity="warn" data-room="厨房">
+            <div class="tip-header">
+              <div class="severity-icon">⚠️</div>
+              <div>
+                <div class="tip-stage">水电阶段</div>
+                <div class="tip-title">厨房台面多留带开关插座</div>
+              </div>
+            </div>
+            <div class="tip-desc">电饭煲、微波炉、空气炸锅、热水壶……台面上至少 4 个带开关五孔，避免频繁拔插。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">厨房</span>
+              <span class="tag tag-warn">建议性</span>
+            </div>
+          </div>
+
+          <div class="tip-card success" data-id="ac-position" data-stage="水电" data-severity="success" data-room="主卧">
+            <div class="tip-header">
+              <div class="severity-icon">✅</div>
+              <div>
+                <div class="tip-stage">水电阶段</div>
+                <div class="tip-title">空调位置避开床尾</div>
+              </div>
+            </div>
+            <div class="tip-desc">检查通过。冷风不会直吹睡觉位置，建议出风口偏移床尾 30cm 以上。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">主卧</span>
+              <span class="tag tag-success">已通过</span>
+            </div>
+          </div>
+
+          <!-- ====== 家具 ====== -->
+          <div class="tip-card danger" data-id="wardrobe-window" data-stage="家具" data-severity="danger" data-room="主卧">
+            <div class="tip-header">
+              <div class="severity-icon">🚨</div>
+              <div>
+                <div class="tip-stage">家具阶段</div>
+                <div class="tip-title">衣柜靠窗会遮挡 60% 自然光</div>
+              </div>
+            </div>
+            <div class="tip-desc">主卧朝北本身光弱，4m 大衣柜挪到窗边后采光骤降。建议改回东墙或换成 1.2m 低柜。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">主卧</span>
+              <span class="tag tag-warn">原则性</span>
+            </div>
+          </div>
+
+          <div class="tip-card warn" data-id="dresser-gap" data-stage="家具" data-severity="warn" data-room="主卧">
+            <div class="tip-header">
+              <div class="severity-icon">⚠️</div>
+              <div>
+                <div class="tip-stage">家具阶段</div>
+                <div class="tip-title">梳妆台与墙留 3cm 缝隙是清洁死角</div>
+              </div>
+            </div>
+            <div class="tip-desc">扫地机器人进不去，长期积灰。建议紧贴墙或留 30cm 以上，方便拖把/机器人进出。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">主卧</span>
+              <span class="tag tag-warn">建议性</span>
+            </div>
+          </div>
+
+          <div class="tip-card info" data-id="nightstand-drawer" data-stage="家具" data-severity="info" data-room="主卧">
+            <div class="tip-header">
+              <div class="severity-icon">💡</div>
+              <div>
+                <div class="tip-stage">家具阶段</div>
+                <div class="tip-title">床头柜选带抽屉款，高度齐平床垫</div>
+              </div>
+            </div>
+            <div class="tip-desc">夜起拿东西不用开灯。高度与床垫齐平 ± 5cm 最舒适，伸手即可够到。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">主卧</span>
+              <span class="tag tag-info">参考性</span>
+            </div>
+          </div>
+
+          <div class="tip-card warn" data-id="wardrobe-price" data-stage="家具" data-severity="warn" data-room="主卧">
+            <div class="tip-header">
+              <div class="severity-icon">⚠️</div>
+              <div>
+                <div class="tip-stage">家具阶段</div>
+                <div class="tip-title">定制大衣柜价格偏高需比价</div>
+              </div>
+            </div>
+            <div class="tip-desc">「舒适档」4m 衣柜常见区间 ¥ 8,000-10,000，¥ 12,000 略高。可考虑减少抽屉或换板材降本。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">主卧</span>
+              <span class="tag tag-warn">建议性</span>
+            </div>
+          </div>
+
+          <div class="tip-card info" data-id="kid-bunk-bed" data-stage="家具" data-severity="info" data-room="儿童房">
+            <div class="tip-header">
+              <div class="severity-icon">💡</div>
+              <div>
+                <div class="tip-stage">家具阶段</div>
+                <div class="tip-title">儿童房预留可改造的双层床位</div>
+              </div>
+            </div>
+            <div class="tip-desc">孩子大了可拆为单床+书桌，避免 5 年后再次大改。预留电源点位配合改造。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">儿童房</span>
+              <span class="tag tag-info">参考性</span>
+            </div>
+          </div>
+
+          <div class="tip-card warn" data-id="sofa-size" data-stage="家具" data-severity="warn" data-room="客厅">
+            <div class="tip-header">
+              <div class="severity-icon">⚠️</div>
+              <div>
+                <div class="tip-stage">家具阶段</div>
+                <div class="tip-title">客厅+餐厅打通后沙发不超过 2.6m</div>
+              </div>
+            </div>
+            <div class="tip-desc">拆墙后客厅变长，但沙发过长会挤占过道。建议控制在 2.4-2.6m，保留 1m 以上通行宽度。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">客厅</span>
+              <span class="tag tag-warn">建议性</span>
+            </div>
+          </div>
+
+          <div class="tip-card info" data-id="kid-desk" data-stage="家具" data-severity="info" data-room="儿童房">
+            <div class="tip-header">
+              <div class="severity-icon">💡</div>
+              <div>
+                <div class="tip-stage">家具阶段</div>
+                <div class="tip-title">儿童书桌选可升降款</div>
+              </div>
+            </div>
+            <div class="tip-desc">孩子身高变化快，固定高度书桌 2-3 年就不合适。可升降 + 含抽屉，小学到初中全覆盖。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">儿童房</span>
+              <span class="tag tag-info">参考性</span>
+            </div>
+          </div>
+
+          <!-- ====== 门窗 ====== -->
+          <div class="tip-card danger" data-id="kitchen-partition" data-stage="门窗" data-severity="danger" data-room="厨房">
+            <div class="tip-header">
+              <div class="severity-icon">🚨</div>
+              <div>
+                <div class="tip-stage">门窗阶段</div>
+                <div class="tip-title">厨房开放式 → 烟道隔断必做</div>
+              </div>
+            </div>
+            <div class="tip-desc">建议玻璃推拉门，既保留开放感又能在炒菜时隔绝油烟。有娃家庭尤其重要——油烟对儿童呼吸道有害。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">厨房</span>
+              <span class="tag tag-warn">原则性</span>
+            </div>
+          </div>
+
+          <div class="tip-card warn" data-id="toilet-door" data-stage="门窗" data-severity="warn" data-room="卫生间">
+            <div class="tip-header">
+              <div class="severity-icon">⚠️</div>
+              <div>
+                <div class="tip-stage">门窗阶段</div>
+                <div class="tip-title">卫生间门避开马桶正对方向</div>
+              </div>
+            </div>
+            <div class="tip-desc">开门即见马桶既尴尬又不卫生。布局上尽量让洗手台作为进门第一视角，马桶靠内侧。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">卫生间</span>
+              <span class="tag tag-warn">建议性</span>
+            </div>
+          </div>
+
+          <div class="tip-card info" data-id="balcony-window" data-stage="门窗" data-severity="info" data-room="阳台">
+            <div class="tip-header">
+              <div class="severity-icon">💡</div>
+              <div>
+                <div class="tip-stage">门窗阶段</div>
+                <div class="tip-title">阳台封窗选断桥铝，隔热隔音</div>
+              </div>
+            </div>
+            <div class="tip-desc">普通铝合金窗冬冷夏热，断桥铝 + 双层中空玻璃是性价比之选。高层注意安全锁扣。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">阳台</span>
+              <span class="tag tag-info">参考性</span>
+            </div>
+          </div>
+
+          <!-- ====== 软装 ====== -->
+          <div class="tip-card info" data-id="cat-path" data-stage="软装" data-severity="info" data-room="全屋">
+            <div class="tip-header">
+              <div class="severity-icon">🐱</div>
+              <div>
+                <div class="tip-stage">软装阶段</div>
+                <div class="tip-title">猫咪友好：预留跳跃路径</div>
+              </div>
+            </div>
+            <div class="tip-desc">客厅书架 → 餐边柜 → 阳台高低台形成连贯动线。猫砂盆位置远离用餐区和儿童活动区。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">全屋</span>
+              <span class="tag tag-info">参考性</span>
+            </div>
+          </div>
+
+          <div class="tip-card warn" data-id="sofa-cover" data-stage="软装" data-severity="warn" data-room="客厅">
+            <div class="tip-header">
+              <div class="severity-icon">⚠️</div>
+              <div>
+                <div class="tip-stage">软装阶段</div>
+                <div class="tip-title">布艺沙发建议加防污套</div>
+              </div>
+            </div>
+            <div class="tip-desc">有猫家庭必备——猫毛和偶尔的呕吐物会渗入布面。选可拆洗款，多备一套换洗。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">客厅</span>
+              <span class="tag tag-warn">建议性</span>
+            </div>
+          </div>
+
+          <div class="tip-card info" data-id="kid-growth" data-stage="软装" data-severity="info" data-room="儿童房">
+            <div class="tip-header">
+              <div class="severity-icon">💡</div>
+              <div>
+                <div class="tip-stage">软装阶段</div>
+                <div class="tip-title">儿童房预留 5-10 年成长空间</div>
+              </div>
+            </div>
+            <div class="tip-desc">4 岁到 14 岁需求巨变。少做固定家具，多用可移动、可替换的单品。墙面颜色选中性，后期好搭配。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">儿童房</span>
+              <span class="tag tag-info">参考性</span>
+            </div>
+          </div>
+
+          <div class="tip-card warn" data-id="furniture-gap" data-stage="软装" data-severity="warn" data-room="全屋">
+            <div class="tip-header">
+              <div class="severity-icon">⚠️</div>
+              <div>
+                <div class="tip-stage">软装阶段</div>
+                <div class="tip-title">靠墙家具建议留 10cm 散热距离</div>
+              </div>
+            </div>
+            <div class="tip-desc">沙发、电视柜、冰箱等靠墙摆放时留 10cm 空隙，利于散热和清洁。尤其冰箱，散热不足耗电飙升。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">全屋</span>
+              <span class="tag tag-warn">建议性</span>
+            </div>
+          </div>
+
+          <!-- ====== 整体 ====== -->
+          <div class="tip-card warn" data-id="ceiling-light" data-stage="整体" data-severity="warn" data-room="全屋">
+            <div class="tip-header">
+              <div class="severity-icon">⚠️</div>
+              <div>
+                <div class="tip-stage">整体阶段</div>
+                <div class="tip-title">主灯尽量避开床正上方</div>
+              </div>
+            </div>
+            <div class="tip-desc">躺在床上直视光源不舒适，风水上也有「横梁压床」的忌讳。首选分散式无主灯或偏一侧的吊灯。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">全屋</span>
+              <span class="tag tag-warn">建议性</span>
+            </div>
+          </div>
+
+          <div class="tip-card info" data-id="warm-light" data-stage="整体" data-severity="info" data-room="主卧">
+            <div class="tip-header">
+              <div class="severity-icon">💡</div>
+              <div>
+                <div class="tip-stage">整体阶段</div>
+                <div class="tip-title">主卧朝北建议加暖光辅助</div>
+              </div>
+            </div>
+            <div class="tip-desc">北向房间自然光偏冷白，用 3000K 暖光落地灯或壁灯中和，空间更温馨。不建议单靠主灯。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">主卧</span>
+              <span class="tag tag-info">参考性</span>
+            </div>
+          </div>
+
+          <div class="tip-card info" data-id="dark-floor" data-stage="整体" data-severity="info" data-room="全屋">
+            <div class="tip-header">
+              <div class="severity-icon">💡</div>
+              <div>
+                <div class="tip-stage">整体阶段</div>
+                <div class="tip-title">深色地板建议配浅色家具</div>
+              </div>
+            </div>
+            <div class="tip-desc">深色地板显灰、显空间小。浅色家具（米白、原木色）能提亮整体，形成层次感，奶油风尤其适配。</div>
+            <div class="tip-meta">
+              <span class="tag tag-primary">全屋</span>
+              <span class="tag tag-info">参考性</span>
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Drawer -->
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-header">
+      <h3 id="drawer-title" style="margin:0;color:var(--color-deep);">避坑详情</h3>
+      <button id="drawer-close" style="font-size:22px;color:var(--color-mute);">×</button>
+    </div>
+    <div class="drawer-body" id="drawer-body"></div>
+    <div class="drawer-footer">
+      <button class="btn btn-ghost flex-1" id="drawer-mark">✅ 标记为已阅</button>
+      <button class="btn btn-primary flex-1" id="drawer-share">📤 分享这条</button>
+    </div>
+  </div>
+
+  <script src="js/shared.js"></script>
+  <script>
+    document.getElementById('topbar').innerHTML = AnxinHome.renderTopbar('tips');
+
+    // ========== 筛选状态 ==========
+    let searchTerm = '';
+    let unreadOnly = false;
+    let readIds = new Set(JSON.parse(localStorage.getItem('anxin_tips_read') || '[]'));
+
+    function saveReadIds() {
+      localStorage.setItem('anxin_tips_read', JSON.stringify([...readIds]));
+    }
+
+    function getCheckedValues(selector) {
+      return Array.from(document.querySelectorAll(selector + ':checked')).map(el => el.value);
+    }
+
+    // ========== 筛选主函数 ==========
+    function filterTips() {
+      const selectedStages = getCheckedValues('.filter-stage');
+      const selectedSeverities = getCheckedValues('.filter-severity');
+      const selectedRooms = getCheckedValues('.filter-room');
+
+      let visibleCount = 0;
+      document.querySelectorAll('.tip-card').forEach(card => {
+        let show = true;
+
+        // 环节（OR 逻辑）
+        if (show && selectedStages.length > 0) {
+          if (!selectedStages.includes(card.dataset.stage)) {
+            show = false;
+          }
+        }
+
+        // 严重度（OR 逻辑）
+        if (show && selectedSeverities.length > 0) {
+          if (!selectedSeverities.includes(card.dataset.severity)) {
+            show = false;
+          }
+        }
+
+        // 房间（OR 逻辑）
+        if (show && selectedRooms.length > 0) {
+          if (!selectedRooms.includes(card.dataset.room)) {
+            show = false;
+          }
+        }
+
+        // 搜索
+        if (show && searchTerm) {
+          const text = (card.querySelector('.tip-title').textContent +
+                        card.querySelector('.tip-desc').textContent).toLowerCase();
+          if (!text.includes(searchTerm.toLowerCase())) {
+            show = false;
+          }
+        }
+
+        // 仅看未阅
+        if (show && unreadOnly && readIds.has(card.dataset.id)) {
+          show = false;
+        }
+
+        // 已阅标记
+        if (readIds.has(card.dataset.id)) {
+          card.classList.add('read');
+          if (!card.querySelector('.read-badge')) {
+            const badge = document.createElement('span');
+            badge.className = 'read-badge';
+            badge.textContent = '✓ 已阅';
+            card.appendChild(badge);
+          }
+        } else {
+          card.classList.remove('read');
+          const badge = card.querySelector('.read-badge');
+          if (badge) badge.remove();
+        }
+
+        card.style.display = show ? '' : 'none';
+        if (show) visibleCount++;
+      });
+      document.getElementById('tip-count').textContent = visibleCount;
+      document.getElementById('read-count').textContent = readIds.size;
+    }
+
+    // ========== 「不限」checkbox ==========
+    document.querySelectorAll('.filter-all').forEach(all => {
+      all.addEventListener('change', function () {
+        if (this.checked) {
+          const group = this.dataset.group;
+          const selector = group === 'stage' ? '.filter-stage'
+            : group === 'severity' ? '.filter-severity'
+            : '.filter-room';
+          document.querySelectorAll(selector).forEach(cb => { cb.checked = false; });
+        }
+        filterTips();
+      });
+    });
+
+    // ========== 具体选项 checkbox ==========
+    document.querySelectorAll('.filter-stage, .filter-severity, .filter-room').forEach(cb => {
+      cb.addEventListener('change', function () {
+        if (this.checked) {
+          const container = this.closest('.filter-options');
+          const group = container ? container.dataset.group : null;
+          if (group) {
+            const all = document.querySelector(`.filter-all[data-group="${group}"]`);
+            if (all) all.checked = false;
+          }
+        }
+        filterTips();
+      });
+    });
+
+    // ========== 搜索（防抖 200ms） ==========
+    let searchTimer;
+    document.querySelector('.search-box input').addEventListener('input', function () {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        searchTerm = this.value.trim();
+        filterTips();
+      }, 200);
+    });
+
+    // ========== 仅看未阅 ==========
+    document.getElementById('toggle-unread').addEventListener('click', function () {
+      unreadOnly = !unreadOnly;
+      this.classList.toggle('btn-primary', unreadOnly);
+      this.classList.toggle('btn-ghost', !unreadOnly);
+      this.textContent = unreadOnly ? '👁 仅看未阅 (已开启)' : '👁 仅看未阅';
+      filterTips();
+    });
+
+    // ========== 清空筛选 ==========
+    document.getElementById('clear-filters').addEventListener('click', () => {
+      document.querySelectorAll('.filter-stage, .filter-severity, .filter-room').forEach(cb => { cb.checked = true; });
+      document.querySelectorAll('.filter-all').forEach(cb => { cb.checked = false; });
+      document.querySelector('.search-box input').value = '';
+      searchTerm = '';
+      if (unreadOnly) {
+        unreadOnly = false;
+        const btn = document.getElementById('toggle-unread');
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-ghost');
+        btn.textContent = '👁 仅看未阅';
+      }
+      filterTips();
+    });
+
+    // ========== 初始化 ==========
+    filterTips();
+
+    // ========== 详情数据 ==========
+    const tipDetails = {
+      'bedside-outlets': {
+        icon: '🚨', severity: 'danger',
+        why: '水电阶段一旦封槽就无法再改。床两侧插座不够，入住后会面临充电要排队、台灯没处插、加湿器拉明线的窘境。',
+        fix: '床头两侧各预留 2 个五孔 + 1 个 USB-A + 1 个 USB-C。底盒距地 75cm（齐平床头柜上方 10cm）。总成本增加不到 ¥200，但装完再改要砸墙 ¥2,000+。',
+        related: ['projector-outlet', 'kitchen-outlets']
+      },
+      'projector-outlet': {
+        icon: '🚨', severity: 'danger',
+        why: '电视墙预埋是水电阶段最容易遗漏的项目。等家具进场后发现 HDMI 线和电源线从电视柜垂到地面，既丑又不安全。',
+        fix: '在沙发墙正对面预埋一根 50mm PVC 管（穿 HDMI + 网线 + 光纤音频），管两端各留一个 86 底盒。同时预留幕布电源（天花板居中）。材料费不到 ¥100，后期加装需拆吊顶。',
+        related: ['sofa-size', 'ceiling-light']
+      },
+      'kitchen-outlets': {
+        icon: '⚠️', severity: 'warn',
+        why: '厨房小电器数量往往是装修时预估的 2 倍。入住半年后空气炸锅、破壁机、咖啡机陆续进场，插座不够就只能用插线板，台面乱且不安全。',
+        fix: '台面上方 15cm 处均匀分布至少 4 个带开关五孔插座（免拔插）。水槽下方预留 2 个（净水器 + 垃圾处理器）。冰箱单独一路。',
+        related: ['kitchen-partition']
+      },
+      'ac-position': {
+        icon: '✅', severity: 'success',
+        why: '空调正对床尾吹是卧室最常见的「住进去才发现」的坑。冷风直吹导致睡眠质量下降，长期可能引发关节不适。',
+        fix: '安装时确保出风口偏离床尾中心线 30cm 以上。如已安装，可加装空调挡风板（¥30-80）临时解决。',
+        related: ['ceiling-light', 'warm-light']
+      },
+      'wardrobe-window': {
+        icon: '🚨', severity: 'danger',
+        why: '主卧朝北本身自然光稀缺。4m 大衣柜靠窗后，窗户被遮挡 >60%，白天也需要开灯，电费和心情双重损失。',
+        fix: '衣柜优先放在东墙或西墙（无窗墙面）。如果空间受限必须靠窗，选 1.2m 以下低柜，让窗户下半部透光。或者改用开放式衣帽间设计，用玻璃隔断代替实体柜门。',
+        related: ['dresser-gap', 'wardrobe-price']
+      },
+      'dresser-gap': {
+        icon: '⚠️', severity: 'warn',
+        why: '家具与墙之间的窄缝（<10cm）扫地机器人进不去，拖把也够不到。半年后缝隙里积满灰和头发，成为蟑螂和尘螨的温床。',
+        fix: '两种方案：① 梳妆台紧贴墙安装（0cm 缝隙），打玻璃胶密封；② 留 30cm 以上宽缝，方便机器人/拖把进出。3cm 是最差的尺寸——既不能密封又不能清洁。',
+        related: ['furniture-gap', 'wardrobe-window']
+      },
+      'nightstand-drawer': {
+        icon: '💡', severity: 'info',
+        why: '开放式床头柜放东西显乱，而且夜起摸黑找东西容易碰倒水杯、手机。带抽屉的床头柜把所有零碎收纳整齐。',
+        fix: '选双抽屉款，上层放常用品（充电器、眼罩），下层放备用。高度 = 床垫高度 ± 5cm，伸手取物最省力。材质与床架统一更协调。',
+        related: ['bedside-outlets']
+      },
+      'wardrobe-price': {
+        icon: '⚠️', severity: 'warn',
+        why: '定制衣柜价格差异极大，同样的 4m 衣柜，颗粒板 ¥6,000 到实木 ¥20,000 都有。¥12,000 在「舒适档」偏贵，可能被商家报了进口板材价却用国产板。',
+        fix: '多找 2-3 家比价，要求标注板材品牌（如露水河、爱格）和环保等级（E0/ENF）。抽屉超过 3 个通常按个加价，可减少抽屉换搁板节省 ¥1,000-2,000。',
+        related: ['wardrobe-window', 'dresser-gap']
+      },
+      'kid-bunk-bed': {
+        icon: '💡', severity: 'info',
+        why: '孩子 3 岁到 14 岁需求剧变。现在装固定的单人床+书桌组合，5 年后孩子长高、审美变化，全部要拆掉重来。',
+        fix: '双层床选「可分体」设计：上下床可拆成两张单人床，或下床拆除改为书桌位。墙面电源预留 2 组（书桌位 + 床头），即使现在不用也先布线。',
+        related: ['kid-desk', 'kid-growth']
+      },
+      'sofa-size': {
+        icon: '⚠️', severity: 'warn',
+        why: '客厅+餐厅打通后空间变长，但沙发过长会挤占通行区。人从沙发背后经过需要至少 80cm，低于这个宽度会侧身走，非常难受。',
+        fix: '量好拆墙后沙发墙到对面墙的距离，减去 1m（通行+茶几），就是沙发最大长度。96㎡ 户型通常控制在 2.4-2.6m，三人位即可，加一个单人椅更灵活。',
+        related: ['projector-outlet', 'sofa-cover']
+      },
+      'kid-desk': {
+        icon: '💡', severity: 'info',
+        why: '孩子一年级身高约 120cm，六年级约 155cm。固定高度书桌 2-3 年就不合身了，导致坐姿歪扭、近视加深。',
+        fix: '选手摇升降或气动升降款（推荐手摇，结构简单不易坏），高度范围 55-75cm 覆盖小学到初中。桌面深度至少 50cm，配可调阅读架。',
+        related: ['kid-bunk-bed', 'kid-growth']
+      },
+      'kitchen-partition': {
+        icon: '🚨', severity: 'danger',
+        why: '开放式厨房在川菜/湘菜家庭中 = 全屋油烟。即使清淡饮食，炒菜时的 PM2.5 瞬时峰值可达 500+，对儿童呼吸道有害。装完发现油烟问题再补装隔断，费用翻倍。',
+        fix: '玻璃推拉门（吊轨，地面无门槛）是最优解——炒菜时关门隔绝油烟，平时全开保持通透。预算 ¥3,000-6,000。不推荐折叠门或布帘——密封差且占空间。',
+        related: ['kitchen-outlets']
+      },
+      'toilet-door': {
+        icon: '⚠️', severity: 'warn',
+        why: '客人来家，推开卫生间门第一眼看到马桶，体验很不好。而且马桶区靠外侧意味着如厕时正对门口，隐私为 0。',
+        fix: '一字型卫生间布局：洗手台 → 马桶 → 淋浴（由外到内）。洗手台作为进门第一视觉点，既美观又实用。如果空间受限，至少做到马桶不在门轴线上。',
+        related: []
+      },
+      'balcony-window': {
+        icon: '💡', severity: 'info',
+        why: '普通铝合金窗导热快，夏天阳台像烤箱冬天像冰窖。断桥铝中间有隔热条，温差可降低 5-8°C，空调费一年省几百。',
+        fix: '选 70 系列断桥铝 + 5mm+12A+5mm 双层中空钢化玻璃。高层必须配安全锁扣和限位器。预算约 ¥600-800/㎡，普通铝合金 ¥300/㎡ 但得不偿失。',
+        related: []
+      },
+      'cat-path': {
+        icon: '🐱', severity: 'info',
+        why: '英短猫天性喜欢登高、巡视领地。如果家里没有纵向动线，猫会自己去爬窗帘、扒书架，损坏家具的同时也有摔伤风险。',
+        fix: '利用客厅现有家具形成「地面 → 书架中层 → 餐边柜顶 → 阳台猫台」的连贯路径。猫砂盆放在阳台角落（远离用餐区和儿童活动区），数量 = 猫数 + 1。',
+        related: ['sofa-cover']
+      },
+      'sofa-cover': {
+        icon: '⚠️', severity: 'warn',
+        why: '猫毛会嵌入布艺纤维深处，普通吸尘器吸不出来。猫偶尔吐毛球或大小便在沙发上，布面一旦渗入就无法彻底清洁。',
+        fix: '选购时确认沙发套可全拆机洗。额外定制一套备用套（¥300-800），换洗时无缝衔接。深色/花纹面料比纯色更耐脏。',
+        related: ['cat-path', 'sofa-size']
+      },
+      'kid-growth': {
+        icon: '💡', severity: 'info',
+        why: '4 岁喜欢的卡通墙纸到 10 岁会觉得「幼稚」。儿童房是全家变化最快的空间，固定装修越多越后悔。',
+        fix: '墙面用中性色乳胶漆（米白/浅灰），通过可更换的软装（窗帘/床品/挂画）来营造童趣。家具选可移动、可调节的，少做固定在墙上的柜子。',
+        related: ['kid-bunk-bed', 'kid-desk']
+      },
+      'furniture-gap': {
+        icon: '⚠️', severity: 'warn',
+        why: '冰箱、电视柜、沙发等大件家具紧贴墙 = 散热差 + 无法清洁。冰箱散热不良耗电增加 10-15%，连续几年下来电费多花上千。',
+        fix: '所有靠墙大件统一留 10cm 空隙（约一拳宽）。视觉上可以用窄边几或高脚花盆遮挡缝隙，既美观又不影响散热。',
+        related: ['dresser-gap']
+      },
+      'ceiling-light': {
+        icon: '⚠️', severity: 'warn',
+        why: '躺在床上正上方的主灯 = 每晚睡前直视光源 = 抑制褪黑素分泌。长期下来影响睡眠质量，而且仰视角度下的灯座积灰一览无余。',
+        fix: '无主灯设计：床头两侧各一盏壁灯/吊线灯（3000K）+ 天花板一圈灯带做间接照明。如果必须用主灯，安装位置偏床尾方向 40cm 以上。',
+        related: ['warm-light', 'ac-position']
+      },
+      'warm-light': {
+        icon: '💡', severity: 'info',
+        why: '北向房间接收的是天空漫反射光，色温偏高（偏蓝白），不人工调暖会显得清冷，影响温馨感。',
+        fix: '床头壁灯或落地灯选 2700-3000K 暖光灯泡。建议用智能灯泡（可调色温+亮度），白天调冷白、夜晚调暖黄，一个灯两种场景。',
+        related: ['ceiling-light', 'ac-position']
+      },
+      'dark-floor': {
+        icon: '💡', severity: 'info',
+        why: '深色地板（深棕/黑胡桃）的一个致命弱点：显灰。一根头发、一点灰尘都清清楚楚。视觉上还会「吸收」光线让空间显小，96㎡ 看起来像 80㎡。',
+        fix: '如果已铺深色地板：家具选米白/原木色提亮，地毯用浅色系过渡。如果还没选地板：奶油风/原木风推荐浅橡木色或奶油米色地板。',
+        related: ['warm-light']
+      }
+    };
+
+    // ========== Drawer 逻辑 ==========
+    const drawer = document.getElementById('drawer');
+    const backdrop = document.getElementById('drawer-backdrop');
+
+    function openDrawer(card) {
+      const id = card.dataset.id;
+      const detail = tipDetails[id];
+      if (!detail) return;
+
+      const title = card.querySelector('.tip-title').textContent;
+      const stage = card.querySelector('.tip-stage').textContent;
+      const desc = card.querySelector('.tip-desc').textContent;
+      const room = card.dataset.room;
+
+      document.getElementById('drawer-title').textContent = title;
+
+      const relatedHtml = detail.related && detail.related.length > 0
+        ? `
+          <div class="detail-section">
+            <h5>相关条目</h5>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              ${detail.related.map(rid => {
+                const relCard = document.querySelector(`.tip-card[data-id="${rid}"]`);
+                if (!relCard) return '';
+                const relTitle = relCard.querySelector('.tip-title').textContent;
+                return `<div class="related-tip" data-id="${rid}">🔗 ${relTitle}</div>`;
+              }).join('')}
+            </div>
+          </div>`
+        : '';
+
+      document.getElementById('drawer-body').innerHTML = `
+        <div class="detail-icon ${detail.severity}">${detail.icon}</div>
+
+        <div class="flex gap-2 mb-3" style="flex-wrap:wrap;">
+          <span class="tag tag-primary">${room}</span>
+          <span class="tag tag-primary">${stage}</span>
+          <span class="tag tag-warn">${card.dataset.severity === 'danger' ? '原则性' : card.dataset.severity === 'warn' ? '建议性' : card.dataset.severity === 'success' ? '已通过' : '参考性'}</span>
+        </div>
+
+        <div class="detail-section">
+          <h5>问题描述</h5>
+          <p>${desc}</p>
+        </div>
+
+        <div class="detail-section">
+          <h5>为什么重要</h5>
+          <div class="highlight-box ${detail.severity}">${detail.why}</div>
+        </div>
+
+        <div class="detail-section">
+          <h5>怎么做</h5>
+          <p>${detail.fix}</p>
+        </div>
+
+        ${relatedHtml}
+      `;
+
+      // 相关条目点击
+      document.querySelectorAll('.related-tip').forEach(rel => {
+        rel.onclick = (e) => {
+          e.stopPropagation();
+          const relCard = document.querySelector(`.tip-card[data-id="${rel.dataset.id}"]`);
+          if (relCard) openDrawer(relCard);
+        };
+      });
+
+      drawer.classList.add('open');
+      backdrop.classList.add('open');
+    }
+
+    function closeDrawer() {
+      drawer.classList.remove('open');
+      backdrop.classList.remove('open');
+    }
+
+    // ========== 卡片点击 → 打开抽屉 ==========
+    document.querySelectorAll('.tip-card').forEach(card => {
+      card.addEventListener('click', () => openDrawer(card));
+    });
+
+    document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+    backdrop.addEventListener('click', closeDrawer);
+
+    // ========== 抽屉底部按钮 ==========
+    let currentOpenCardId = null;
+
+    // 在 openDrawer 里记录当前卡片 id
+    const origOpenDrawer = openDrawer;
+    openDrawer = function(card) {
+      currentOpenCardId = card.dataset.id;
+      document.getElementById('drawer-mark').textContent = readIds.has(currentOpenCardId) ? '✅ 已阅' : '✅ 标记为已阅';
+      origOpenDrawer(card);
+    };
+
+    document.getElementById('drawer-mark').addEventListener('click', () => {
+      if (!currentOpenCardId) return;
+      if (readIds.has(currentOpenCardId)) {
+        readIds.delete(currentOpenCardId);
+        saveReadIds();
+        filterTips();
+        document.getElementById('drawer-mark').textContent = '✅ 标记为已阅';
+        AnxinHome.toast({ type: 'info', title: '已取消标记', msg: '这条已移出你的已阅清单。' });
+      } else {
+        readIds.add(currentOpenCardId);
+        saveReadIds();
+        filterTips();
+        document.getElementById('drawer-mark').textContent = '✅ 已阅';
+        AnxinHome.toast({ type: 'success', title: '✅ 已标记为已阅', msg: '这条避坑知识已加入你的已阅清单。' });
+      }
+    });
+
+    document.getElementById('drawer-share').addEventListener('click', () => {
+      AnxinHome.toast({ type: 'info', title: '📤 已复制分享链接', msg: '已将这条避坑知识链接复制到剪贴板，可以发给家人或装修师傅。' });
+    });
+  </script>
+</body>
+</html>

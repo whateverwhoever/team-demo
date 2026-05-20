@@ -8,7 +8,7 @@ AnxinHome.renderTopbar = function (activeNav) {
     { key: 'home', label: '我的项目', href: 'index.html' },
     { key: 'workspace', label: '工作台', href: 'modeling.html' },
     { key: 'furniture', label: '家具库', href: 'furniture.html' },
-    { key: 'tips', label: '避坑百科', href: '#' },
+    { key: 'tips', label: '避坑百科', href: 'tips.html' },
   ];
   return `
     <header class="topbar">
