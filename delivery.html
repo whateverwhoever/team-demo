@@ -208,6 +208,11 @@
       cursor: pointer;
       transition: 0.2s;
       position: relative;
+
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: #F5F5F5;
     }
     .plan-image:hover {
       transform: translateY(-2px);
@@ -282,22 +287,27 @@
       <!-- Plan -->
       <div class="tab-content" data-tab="plan">
         <div class="plan-grid">
-          <div class="plan-image" style="background:linear-gradient(135deg,#FBF3EA,#F2C8A0);">
+          <div class="plan-image" style="background-image:url('assets/delivery/2D平面布置图.webp');">
             <div class="label">2D 平面布置图</div>
           </div>
-          <div class="plan-image" style="background:linear-gradient(135deg,#F5E5D3,#C9A878);">
+
+          <div class="plan-image" style="background-image:url('assets/delivery/3D鸟瞰图.png');">
             <div class="label">3D 鸟瞰图</div>
           </div>
-          <div class="plan-image" style="background:linear-gradient(135deg,#FCE3D5,#E8825B);">
+
+          <div class="plan-image" style="background-image:url('assets/delivery/水电点位图.jpeg');">
             <div class="label">水电点位图</div>
           </div>
-          <div class="plan-image" style="background:linear-gradient(135deg,#E8DCC8,#8A6A4A);">
+
+          <div class="plan-image" style="background-image:url('assets/delivery/主卧.png');">
             <div class="label">主卧渲染图</div>
           </div>
-          <div class="plan-image" style="background:linear-gradient(135deg,#FCE3D5,#F2B89B);">
+
+          <div class="plan-image" style="background-image:url('assets/delivery/儿童房.png');">
             <div class="label">儿童房渲染图</div>
           </div>
-          <div class="plan-image" style="background:linear-gradient(135deg,#FFF1D2,#F2D89A);">
+
+          <div class="plan-image" style="background-image:url('assets/delivery/餐厅.png');">
             <div class="label">厨餐厅渲染图</div>
           </div>
         </div>
