@@ -46,35 +46,47 @@
     }
 
     .roam-stage {
-      background: var(--color-deep);
       border-radius: 14px;
       overflow: hidden;
       position: relative;
       height: 420px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
-    .roam-img {
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #F5DCC0 0%, #E8C09A 50%, #C9A878 100%);
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .roam-room-mock {
-      width: 80%;
-      height: 80%;
-      position: relative;
-      background: linear-gradient(180deg, #FBF3EA 0%, #F2DEC8 50%, #C9A878 50%, #8A6A4A 100%);
-      border-radius: 8px;
-    }
-    .roam-room-mock .deco {
+    .roam-bg {
       position: absolute;
-      filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.15));
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transition: opacity 0.5s ease;
     }
+    .roam-bg.master-bedroom { background-image: url('assets/renders/master_bedroom.jpg'); }
+    .roam-bg.living-room    { background-image: url('assets/renders/living_room.jpg'); }
+    .roam-bg.children-room  { background-image: url('assets/renders/children_room.jpg'); }
+    .roam-bg.kitchen        { background-image: url('assets/renders/kitchen.jpg'); }
+    .roam-bg.other {
+      background: linear-gradient(135deg, #F5DCC0 0%, #C9A878 100%);
+    }
+    /* 无渲染图房间的占位提示 */
+    .roam-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.32);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .roam-placeholder.visible { opacity: 1; }
+    .roam-placeholder-card {
+      background: rgba(255,255,255,0.92);
+      border-radius: 14px;
+      padding: 22px 32px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--color-deep);
+    }
+    .roam-placeholder-card p { margin: 6px 0 0; font-size: 12px; color: var(--color-mute); }
 
     .roam-controls {
       position: absolute;
@@ -262,26 +274,41 @@
       <!-- 3D Roam -->
       <div class="tab-content active" data-tab="roam">
         <div class="roam-stage">
-          <div class="roam-room-label">🏠 客厅 · 第一人称漫游</div>
-          <div class="roam-img">
-            <div class="roam-room-mock">
-              <span class="deco" style="bottom:25%;left:20%;font-size:80px;">🛋️</span>
-              <span class="deco" style="bottom:30%;right:25%;font-size:60px;">📺</span>
-              <span class="deco" style="top:10%;right:15%;font-size:50px;">🪟</span>
-              <span class="deco" style="bottom:35%;left:48%;font-size:38px;">🪴</span>
-              <span class="deco" style="top:5%;left:45%;font-size:36px;">💡</span>
+          <!-- 背景渲染图 -->
+          <div class="roam-bg master-bedroom" id="roam-bg"></div>
+
+          <!-- 无渲染图时的占位提示 -->
+          <div class="roam-placeholder" id="roam-placeholder">
+            <div class="roam-placeholder-card">
+              <div style="font-size:32px;margin-bottom:8px;">🏠</div>
+              <div id="roam-placeholder-title" style="font-weight:600;">卫生间</div>
+              <p>该空间渲染图即将上线</p>
             </div>
           </div>
+
+          <!-- 装饰画浮层，仅主卧显示 -->
+          <div id="roam-painting" style="
+            position:absolute;
+            top:10%;left:38%;
+            width:110px;
+            z-index:3;
+            pointer-events:none;
+            transition:opacity 0.4s;
+          ">
+            <img src="assets/furniture/wall_painting.png" width="110"
+                 style="display:block;mix-blend-mode:screen;filter:drop-shadow(2px 6px 12px rgba(0,0,0,0.3));">
+          </div>
+
+          <div class="roam-room-label" id="roam-label">🏠 主卧 · 3D 渲染视角</div>
           <div class="roam-controls">
-            <button class="active">客厅</button>
-            <button>主卧</button>
-            <button>儿童房</button>
-            <button>厨房</button>
-            <button>卫生间</button>
-            <button>阳台</button>
+            <button data-bg="living-room" data-label="客厅">客厅</button>
+            <button data-bg="master-bedroom" data-label="主卧" class="active">主卧</button>
+            <button data-bg="children-room" data-label="儿童房">儿童房</button>
+            <button data-bg="kitchen" data-label="厨房">厨房</button>
+
           </div>
         </div>
-        <p class="muted tiny center mt-3">💡 拖动可旋转视角 · 双击进入下一空间(此处 demo,实际版本支持 360° 自由漫游)</p>
+        <p class="muted tiny center mt-3">💡 点击下方房间名称切换空间 · 实际版本支持 360° 自由漫游</p>
       </div>
 
       <!-- Plan -->
@@ -491,11 +518,27 @@
     });
 
     // Roam controls
+    const roamBg = document.getElementById('roam-bg');
+    const roamLabel = document.getElementById('roam-label');
+    const roamPlaceholder = document.getElementById('roam-placeholder');
+    const roamPlaceholderTitle = document.getElementById('roam-placeholder-title');
+    const roamPainting = document.getElementById('roam-painting');
+
     document.querySelectorAll('.roam-controls button').forEach(b => {
       b.onclick = () => {
         document.querySelectorAll('.roam-controls button').forEach(x => x.classList.remove('active'));
         b.classList.add('active');
-        document.querySelector('.roam-room-label').textContent = `🏠 ${b.textContent} · 第一人称漫游`;
+        const bg = b.dataset.bg;
+        const label = b.dataset.label;
+        roamBg.className = 'roam-bg ' + bg;
+        roamLabel.textContent = `🏠 ${label} · 3D 渲染视角`;
+        roamPainting.style.opacity = bg === 'master-bedroom' ? '1' : '0';
+        if (bg === 'other') {
+          roamPlaceholderTitle.textContent = label;
+          roamPlaceholder.classList.add('visible');
+        } else {
+          roamPlaceholder.classList.remove('visible');
+        }
       };
     });
 
