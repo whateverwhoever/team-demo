@@ -23,19 +23,7 @@ window.AnxinChatScripts = {
       text: '好的!那我再了解一下你家里的情况,这样后面的设计能贴合你们的生活习惯。<br><b>家里住几口人?</b> 有老人、小孩或者宠物吗?',
     },
     {
-      role: 'options',
-      multi: true,
-      options: [
-        { label: '夫妻 2 人' },
-        { label: '有 1 个孩子(3-6 岁)' },
-        { label: '有 1 只猫 🐱' },
-        { label: '老人偶尔来住' },
-        { label: '准备生二胎' },
-      ],
-    },
-    {
-      role: 'user',
-      text: '夫妻 + 一个 4 岁的孩子 + 一只英短猫',
+      role: 'familyForm',
     },
     {
       role: 'ai',

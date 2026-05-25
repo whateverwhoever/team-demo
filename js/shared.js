@@ -39,9 +39,6 @@ AnxinHome.renderTopbar = function (activeNav) {
         ${navs.map(n => `<a href="${n.href}" class="${n.key === activeNav ? 'active' : ''}">${n.label}</a>`).join('')}
       </nav>
       <div class="right">
-        <span class="mode-badge ${AnxinHome.modeTagClass()}">${AnxinHome.modeLabel()}</span>
-        <button class="btn btn-ghost btn-sm">📤 分享</button>
-        <button class="btn btn-soft btn-sm">💾 保存</button>
         <div class="avatar">林</div>
       </div>
     </header>

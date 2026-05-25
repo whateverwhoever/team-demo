@@ -25,15 +25,9 @@
     .room-rect.bath { fill: #E8F0F4; }
     .room-rect.dining { fill: #FCE8DD; }
 
-    .door-line {
-      stroke: var(--color-primary);
-      stroke-width: 3;
-      fill: none;
-    }
-    .window-line {
-      stroke: var(--color-info);
-      stroke-width: 4;
-    }
+    .door-line { stroke: var(--color-primary); stroke-width: 3; fill: none; }
+    .window-line { stroke: var(--color-info); stroke-width: 4; }
+
     .canvas-tip {
       position: absolute;
       top: 18px;
@@ -63,14 +57,90 @@
       gap: 14px;
       z-index: 5;
     }
-    .room-tag {
-      font-weight: 700;
-      font-size: 13px;
-      fill: var(--color-deep);
+    .room-tag { font-weight: 700; font-size: 13px; fill: var(--color-deep); }
+    .room-area { font-size: 11px; fill: var(--color-mute); }
+
+    /* ===== 家庭信息卡片表单 ===== */
+    .family-form {
+      background: var(--color-surface-2);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-self: flex-start;
+      max-width: 92%;
     }
-    .room-area {
-      font-size: 11px;
-      fill: var(--color-mute);
+    .family-form .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .family-form .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-deep);
+    }
+    .family-form .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .family-form .chip {
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1.5px solid var(--color-line);
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.15s;
+      background: var(--color-surface);
+      color: var(--color-text);
+      user-select: none;
+    }
+    .family-form .chip.selected {
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+    .family-form .chip:hover:not(.selected) {
+      border-color: var(--color-primary);
+    }
+    .family-form .form-extra {
+      width: 100%;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 1.5px solid var(--color-line);
+      font-size: 12px;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      background: var(--color-surface);
+      color: var(--color-text);
+      box-sizing: border-box;
+    }
+    .family-form .form-extra:focus {
+      border-color: var(--color-primary);
+    }
+    .family-form .form-submit {
+      align-self: flex-end;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      padding: 7px 20px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .family-form .form-submit:hover {
+      background: var(--color-primary-dark);
+    }
+
+    /* 右侧对话流：超出高度后内部滚动，不再撑大整个页面 */
+    #chat.chat-stream {
+      max-height: 520px;
+      overflow-y: auto;
     }
   </style>
 </head>
@@ -103,70 +173,50 @@
           <div class="canvas-tip">💡 点击任意房间可修改名称或用途</div>
 
           <svg class="floorplan-svg" viewBox="0 0 720 520" preserveAspectRatio="xMidYMid meet">
-            <!-- 外墙 -->
             <rect x="40" y="40" width="640" height="440" fill="none" stroke="#4A3C32" stroke-width="4" />
-
-            <!-- 主卧 -->
             <rect class="room-rect bedroom" data-room="A" x="40" y="40" width="240" height="180" />
             <text class="room-tag" x="160" y="125" text-anchor="middle">A · 主卧</text>
             <text class="room-area" x="160" y="145" text-anchor="middle">12.5 ㎡</text>
-
-            <!-- 次卧 -->
             <rect class="room-rect bedroom" data-room="B" x="280" y="40" width="180" height="180" />
             <text class="room-tag" x="370" y="125" text-anchor="middle">B · 次卧</text>
             <text class="room-area" x="370" y="145" text-anchor="middle">9.0 ㎡</text>
-
-            <!-- 儿童房(默认还是次卧 已合并到 B,这里改一间为儿童房示范) -->
+            <rect class="room-rect" data-room="I" x="280" y="220" width="180" height="60" fill="#EAEAEA" />
+            <text class="room-tag" x="420" y="250" text-anchor="middle">I · 杂物间</text>
+            <text class="room-area" x="420" y="265" text-anchor="middle">4.5 ㎡</text>
             <rect class="room-rect bedroom" data-room="C" x="460" y="40" width="220" height="120" />
             <text class="room-tag" x="570" y="95" text-anchor="middle">C · 儿童房</text>
             <text class="room-area" x="570" y="115" text-anchor="middle">9.5 ㎡</text>
-
-            <!-- 卫生间 -->
             <rect class="room-rect bath" data-room="D" x="460" y="160" width="100" height="120" />
             <text class="room-tag" x="510" y="215" text-anchor="middle">D · 卫生间</text>
             <text class="room-area" x="510" y="235" text-anchor="middle">4.5 ㎡</text>
-
-            <!-- 厨房 -->
             <rect class="room-rect kitchen" data-room="E" x="560" y="160" width="120" height="120" />
             <text class="room-tag" x="620" y="215" text-anchor="middle">E · 厨房</text>
             <text class="room-area" x="620" y="235" text-anchor="middle">7.0 ㎡</text>
-
-            <!-- 客厅 -->
             <rect class="room-rect living" data-room="F" x="40" y="220" width="340" height="260" />
             <text class="room-tag" x="210" y="345" text-anchor="middle">F · 客厅</text>
             <text class="room-area" x="210" y="365" text-anchor="middle">22.0 ㎡</text>
-
-            <!-- 餐厅 -->
             <rect class="room-rect dining" data-room="G" x="380" y="280" width="180" height="200" />
             <text class="room-tag" x="470" y="375" text-anchor="middle">G · 餐厅</text>
             <text class="room-area" x="470" y="395" text-anchor="middle">11.0 ㎡</text>
-
-            <!-- 阳台 -->
             <rect class="room-rect" data-room="H" x="560" y="280" width="120" height="200" fill="#E8F0F4" />
             <text class="room-tag" x="620" y="375" text-anchor="middle">H · 阳台</text>
             <text class="room-area" x="620" y="395" text-anchor="middle">5.0 ㎡</text>
-
-            <!-- 门(用弧形象征) -->
             <path class="door-line" d="M 280 110 A 25 25 0 0 1 305 135" />
             <path class="door-line" d="M 460 110 A 22 22 0 0 1 482 132" />
             <path class="door-line" d="M 220 220 A 26 26 0 0 1 246 246" />
             <path class="door-line" d="M 380 320 A 22 22 0 0 1 402 342" />
             <path class="door-line" d="M 560 220 A 22 22 0 0 1 582 242" />
-
-            <!-- 窗户 -->
             <line class="window-line" x1="100" y1="40" x2="200" y2="40" />
             <line class="window-line" x1="310" y1="40" x2="430" y2="40" />
             <line class="window-line" x1="490" y1="40" x2="640" y2="40" />
             <line class="window-line" x1="560" y1="480" x2="680" y2="480" />
             <line class="window-line" x1="40" y1="280" x2="40" y2="420" />
-
-            <!-- 入户门 -->
             <rect x="160" y="475" width="60" height="10" fill="#E8825B" />
             <text x="190" y="500" text-anchor="middle" font-size="11" fill="#E8825B" font-weight="600">入户门</text>
           </svg>
 
           <div class="confirm-bar">
-            <div class="tiny muted">识别完成后,确认结构进入 3D 建模</div>
+            <div class="tiny muted">识别完成后，确认结构进入 3D 建模</div>
             <a href="global-design.html" class="btn btn-primary btn-sm">确认结构 · 下一步 →</a>
           </div>
         </div>
@@ -176,6 +226,7 @@
           <span><span class="swatch" style="background:#FEF1E3;border:1px solid #4A3C32;"></span>客厅/餐厅</span>
           <span><span class="swatch" style="background:#FFF8E1;border:1px solid #4A3C32;"></span>厨房</span>
           <span><span class="swatch" style="background:#E8F0F4;border:1px solid #4A3C32;"></span>卫生间/阳台</span>
+          <span><span class="swatch" style="background:#EAEAEA;border:1px solid #4A3C32;"></span>杂物间</span>
           <span><span class="swatch" style="background:#E8825B;"></span>门</span>
           <span><span class="swatch" style="background:#6FA9C9;"></span>窗</span>
         </div>
@@ -190,7 +241,7 @@
         </div>
         <div class="chat-stream" id="chat"></div>
         <div class="chat-input">
-          <input id="chat-input" placeholder="告诉我你的想法,比如「厨房太窄」..." />
+          <input id="chat-input" placeholder="告诉我你的想法，比如「厨房太窄」..." />
           <button class="chat-send" id="chat-send">▶</button>
         </div>
       </aside>
@@ -203,7 +254,6 @@
     document.getElementById('topbar').innerHTML = AnxinHome.renderTopbar('workspace');
     document.getElementById('progress').innerHTML = AnxinHome.renderProgress('modeling');
 
-    // Pro mode UI
     if (AnxinHome.isPro()) {
       document.querySelectorAll('.pro-only').forEach(el => el.style.display = '');
       document.querySelectorAll('.novice-label').forEach(el => el.style.display = 'none');
@@ -213,6 +263,111 @@
     const chat = document.getElementById('chat');
     const script = window.AnxinChatScripts.modeling;
     let idx = 0;
+
+    // ===== 渲染家庭信息卡片表单 =====
+    function appendFamilyForm(onSubmit) {
+      const wrap = document.createElement('div');
+      wrap.className = 'family-form';
+
+      wrap.innerHTML = `
+        <div class="form-row">
+          <div class="form-label">👨‍👩‍👧 家里住几口人？</div>
+          <div class="chip-group" id="chip-count">
+            <div class="chip" data-val="1人独居">1人独居</div>
+            <div class="chip" data-val="夫妻2人">夫妻2人</div>
+            <div class="chip" data-val="三口之家">三口之家</div>
+            <div class="chip" data-val="四口及以上">四口及以上</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label">🧒 有没有小孩？</div>
+          <div class="chip-group" id="chip-kid">
+            <div class="chip" data-val="没有小孩">没有</div>
+            <div class="chip" data-val="0-3岁婴幼儿">0-3岁婴幼儿</div>
+            <div class="chip" data-val="3-6岁学龄前">3-6岁学龄前</div>
+            <div class="chip" data-val="6-12岁小学生">6-12岁小学生</div>
+            <div class="chip" data-val="准备生育">准备生育</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label">🐾 有没有宠物？</div>
+          <div class="chip-group" id="chip-pet">
+            <div class="chip" data-val="没有宠物">没有</div>
+            <div class="chip" data-val="养猫">🐱 猫</div>
+            <div class="chip" data-val="养狗">🐶 狗</div>
+            <div class="chip" data-val="其他宠物">其他</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label">👴 有无老人同住？</div>
+          <div class="chip-group" id="chip-elder">
+            <div class="chip" data-val="无老人">没有</div>
+            <div class="chip" data-val="老人长期同住">长期同住</div>
+            <div class="chip" data-val="老人偶尔来住">偶尔来住</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label">✏️ 其他补充（可选）</div>
+          <textarea class="form-extra" id="form-extra" rows="2" placeholder="例如：准备生二胎、有轮椅需求、需要书房..."></textarea>
+        </div>
+
+        <button class="form-submit" id="form-submit">确认 ✓</button>
+      `;
+
+      // chip 单选逻辑（每组独立）
+      ['chip-count', 'chip-kid', 'chip-pet', 'chip-elder'].forEach(groupId => {
+        wrap.querySelector('#' + groupId).querySelectorAll('.chip').forEach(chip => {
+          chip.onclick = () => {
+            wrap.querySelector('#' + groupId).querySelectorAll('.chip')
+              .forEach(c => c.classList.remove('selected'));
+            chip.classList.add('selected');
+          };
+        });
+      });
+
+      // 提交
+      wrap.querySelector('#form-submit').onclick = () => {
+        const getValue = (groupId) => {
+          const sel = wrap.querySelector('#' + groupId + ' .chip.selected');
+          return sel ? sel.dataset.val : null;
+        };
+        const count  = getValue('chip-count');
+        const kid    = getValue('chip-kid');
+        const pet    = getValue('chip-pet');
+        const elder  = getValue('chip-elder');
+        const extra  = wrap.querySelector('#form-extra').value.trim();
+
+        // 至少选了人口数量才允许提交
+        if (!count) {
+          wrap.querySelector('#chip-count').style.outline = '2px solid var(--color-primary)';
+          wrap.querySelector('#chip-count').style.borderRadius = '8px';
+          return;
+        }
+
+        // 禁用整个表单，防止重复提交
+        wrap.querySelectorAll('.chip, .form-submit, .form-extra')
+          .forEach(el => el.style.pointerEvents = 'none');
+        wrap.querySelector('#form-submit').style.opacity = '0.5';
+
+        // 拼出用户摘要文字
+        const parts = [count];
+        if (kid && kid !== '没有小孩') parts.push(kid);
+        if (pet && pet !== '没有宠物') parts.push(pet);
+        if (elder && elder !== '无老人') parts.push(elder);
+        if (extra) parts.push(extra);
+        const summary = parts.join(' · ');
+
+        onSubmit(summary);
+      };
+
+      chat.appendChild(wrap);
+      chat.scrollTop = chat.scrollHeight;
+      return wrap;
+    }
 
     async function playNext() {
       if (idx >= script.length) return;
@@ -225,14 +380,25 @@
         AnxinHome.appendBubble(chat, { role: 'ai', html: step.text });
         await AnxinHome.delay(300);
         playNext();
+
       } else if (step.role === 'system') {
         AnxinHome.appendBubble(chat, { role: 'system', html: step.text });
         await AnxinHome.delay(200);
         playNext();
+
       } else if (step.role === 'user') {
         AnxinHome.appendBubble(chat, { role: 'user', html: step.text });
         await AnxinHome.delay(200);
         playNext();
+
+      } else if (step.role === 'familyForm') {
+        // 渲染卡片表单，用户点确认后继续脚本
+        appendFamilyForm((summary) => {
+          // 把用户选择以气泡形式显示
+          AnxinHome.appendBubble(chat, { role: 'user', html: summary });
+          setTimeout(playNext, 400);
+        });
+
       } else if (step.role === 'options') {
         AnxinHome.appendOptions(chat, step.options, (opt) => {
           AnxinHome.appendBubble(chat, { role: 'user', html: opt.label });
@@ -247,23 +413,25 @@
 
     setTimeout(playNext, 400);
 
-    // Room click → highlight + chat hint
+    // Room click
     document.querySelectorAll('.room-rect').forEach(rect => {
       rect.onclick = () => {
-        document.querySelectorAll('.room-rect').forEach(r => r.style.strokeWidth = '2.5');
+        document.querySelectorAll('.room-rect').forEach(r => {
+          r.style.strokeWidth = '2.5';
+          r.style.stroke = '';
+        });
         rect.style.strokeWidth = '4';
         rect.style.stroke = 'var(--color-primary)';
-        const room = rect.dataset.room;
         AnxinHome.toast({
           type: 'info',
-          title: `已锁定 ${rect.querySelector('text').textContent}`,
+          title: `已锁定房间`,
           msg: '在右侧对话框中可以单独描述这个空间的需求。',
           duration: 3000,
         });
       };
     });
 
-    // Manual chat send (mock)
+    // Manual chat send
     document.getElementById('chat-send').onclick = () => {
       const v = document.getElementById('chat-input').value.trim();
       if (!v) return;
