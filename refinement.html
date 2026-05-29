@@ -234,13 +234,41 @@
     .ci-title { font-weight: 600; color: var(--color-deep); margin-bottom: 2px; }
     .ci-desc  { color: var(--color-mute); line-height: 1.4; }
 
-    /* AI 对话区 */
+    /* ===== AI 对话区折叠 ===== */
+    .chat-accordion {
+      border-top: 1px solid var(--color-line);
+      display: flex; flex-direction: column;
+      flex: 1; min-height: 0;
+      overflow: hidden;
+    }
+    .chat-accordion-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 14px; cursor: pointer; user-select: none;
+      font-size: 12px; font-weight: 600; color: var(--color-deep);
+      transition: background 0.15s; flex-shrink: 0;
+    }
+    .chat-accordion-header:hover { background: var(--color-surface-2); }
+    .chat-accordion-header .acc-icon { font-size: 15px; transition: transform 0.25s; }
+    .chat-accordion.open .chat-accordion-header .acc-icon { transform: rotate(180deg); }
+    .chat-accordion-body {
+      display: flex; flex-direction: column;
+      flex: 1; min-height: 0;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.35s ease;
+    }
+    .chat-accordion.open .chat-accordion-body {
+      max-height: 400px;
+    }
+
+    /* AI 对话流 */
     .chat-stream-wrap {
       flex: 1; overflow-y: auto; padding: 8px 16px;
       min-height: 0;
-      max-height: 160px;
+      max-height: 1450px;
     }
     .chat-input-wrap {
+      /* 把顶部 padding 从 10px 改成 16px，输入框自然向下挪，更美观 */
       padding: 10px 16px 14px; border-top: 1px solid var(--color-line);
       flex-shrink: 0;
     }
@@ -328,72 +356,78 @@
         <!-- 折叠卡片区（内部滚动） -->
         <div class="accordions-wrap">
 
-        <!-- 折叠卡片1：家具详情（默认展开） -->
-        <div class="accordion open" id="acc-furniture">
-          <div class="accordion-header" onclick="toggleAcc('acc-furniture')">
-            <span id="acc-furniture-title">💡 台灯（已选中）</span>
-            <span class="acc-icon">▾</span>
-          </div>
-          <div class="accordion-body">
-            <div id="property-inner">
-              <!-- 由JS渲染 -->
+          <!-- 折叠卡片1：家具详情（默认收起，无选中状态） -->
+          <div class="accordion" id="acc-furniture">
+            <div class="accordion-header" onclick="toggleAcc('acc-furniture')">
+              <span id="acc-furniture-title">🪑 家具详情</span>
+              <span class="acc-icon">▾</span>
+            </div>
+            <div class="accordion-body">
+              <div id="property-inner">
+                <!-- 由JS渲染 -->
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- 折叠卡片2：风险历史（默认折叠，触发时展开） -->
-        <div class="accordion" id="acc-risk">
-          <div class="accordion-header" onclick="toggleAcc('acc-risk')">
-            <span>⚠️ 风险记录 <span id="risk-count" style="font-weight:400;color:var(--color-mute);font-size:11px;">（暂无）</span></span>
-            <span class="acc-icon">▾</span>
-          </div>
-          <div class="accordion-body">
-            <div class="risk-list" id="risk-list">
-              <div class="risk-empty" id="risk-empty">还没有触发风险，继续调整吧</div>
+          <!-- 折叠卡片2：风险历史（默认折叠，触发时展开） -->
+          <div class="accordion" id="acc-risk">
+            <div class="accordion-header" onclick="toggleAcc('acc-risk')">
+              <span>⚠️ 风险记录 <span id="risk-count" style="font-weight:400;color:var(--color-mute);font-size:11px;">（暂无）</span></span>
+              <span class="acc-icon">▾</span>
+            </div>
+            <div class="accordion-body">
+              <div class="risk-list" id="risk-list">
+                <div class="risk-empty" id="risk-empty">还没有触发风险，继续调整吧</div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- 折叠卡片3：风险提示清单（默认折叠） -->
-        <div class="accordion" id="acc-checklist">
-          <div class="accordion-header" onclick="toggleAcc('acc-checklist')">
-            <span>📋 风险提示清单</span>
-            <span class="acc-icon">▾</span>
-          </div>
-          <div class="accordion-body">
-            <div class="checklist-inline" id="checklist-inline">
-              <div class="checklist-inline-item" onclick="toggleCheck(this)">
-                <div class="ci-box"></div>
-                <div><div class="ci-title">空调位置是否对着床尾吹?</div><div class="ci-desc">冷风直吹床尾会影响睡眠，建议偏移 30cm 以上。</div></div>
-              </div>
-              <div class="checklist-inline-item" onclick="toggleCheck(this)">
-                <div class="ci-box"></div>
-                <div><div class="ci-title">床头插座是否够用?</div><div class="ci-desc">至少 2 个 USB + 2 个五孔，装完改不了。</div></div>
-              </div>
-              <div class="checklist-inline-item" onclick="toggleCheck(this)">
-                <div class="ci-box"></div>
-                <div><div class="ci-title">衣柜与墙之间是否留够清洁空间?</div><div class="ci-desc">建议紧贴或留 30cm 以上。</div></div>
-              </div>
-              <div class="checklist-inline-item" onclick="toggleCheck(this)">
-                <div class="ci-box"></div>
-                <div><div class="ci-title">主灯是否避开了床正上方?</div><div class="ci-desc">风水忌讳之外，长期视角不舒适。</div></div>
+          <!-- 折叠卡片3：风险提示清单（默认折叠） -->
+          <div class="accordion" id="acc-checklist">
+            <div class="accordion-header" onclick="toggleAcc('acc-checklist')">
+              <span>📋 风险提示清单</span>
+              <span class="acc-icon">▾</span>
+            </div>
+            <div class="accordion-body">
+              <div class="checklist-inline" id="checklist-inline">
+                <div class="checklist-inline-item" onclick="toggleCheck(this)">
+                  <div class="ci-box"></div>
+                  <div><div class="ci-title">空调位置是否对着床尾吹?</div><div class="ci-desc">冷风直吹床尾会影响睡眠，建议偏移 30cm 以上。</div></div>
+                </div>
+                <div class="checklist-inline-item" onclick="toggleCheck(this)">
+                  <div class="ci-box"></div>
+                  <div><div class="ci-title">床头插座是否够用?</div><div class="ci-desc">至少 2 个 USB + 2 个五孔，装完改不了。</div></div>
+                </div>
+                <div class="checklist-inline-item" onclick="toggleCheck(this)">
+                  <div class="ci-box"></div>
+                  <div><div class="ci-title">衣柜与墙之间是否留够清洁空间?</div><div class="ci-desc">建议紧贴或留 30cm 以上。</div></div>
+                </div>
+                <div class="checklist-inline-item" onclick="toggleCheck(this)">
+                  <div class="ci-box"></div>
+                  <div><div class="ci-title">主灯是否避开了床正上方?</div><div class="ci-desc">风水忌讳之外，长期视角不舒适。</div></div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
         </div><!-- /accordions-wrap -->
 
-        <!-- AI 对话流 -->
-        <div class="chat-stream-wrap">
-          <div class="chat-stream" id="chat"></div>
-        </div>
-
-        <!-- 输入框置底 -->
-        <div class="chat-input-wrap">
-          <div class="chat-input">
-            <input id="chat-input" placeholder="比如「台灯挪到床头」「装饰画换位置」..." />
-            <button class="chat-send" id="chat-send">▶</button>
+        <!-- AI 对话区：可折叠，默认收起 -->
+        <div class="chat-accordion" id="chat-accordion">
+          <div class="chat-accordion-header" id="chat-accordion-header" onclick="toggleChatAcc()">
+            <span>🤖 AI 对话助手</span>
+            <span class="acc-icon">▾</span>
+          </div>
+          <div class="chat-accordion-body" id="chat-accordion-body">
+            <div class="chat-stream-wrap">
+              <div class="chat-stream" id="chat"></div>
+            </div>
+            <div class="chat-input-wrap">
+              <div class="chat-input">
+                <input id="chat-input" placeholder="比如「台灯挪到床头」「装饰画换位置」..." />
+                <button class="chat-send" id="chat-send">▶</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -414,6 +448,18 @@
       document.getElementById(id).classList.toggle('open');
     }
 
+    // ===== AI 对话区折叠 =====
+    let chatScriptStarted = false;
+    function toggleChatAcc() {
+      const acc = document.getElementById('chat-accordion');
+      acc.classList.toggle('open');
+      // 第一次展开时启动对话脚本
+      if (acc.classList.contains('open') && !chatScriptStarted) {
+        chatScriptStarted = true;
+        setTimeout(playNext, 400);
+      }
+    }
+
     // ===== Checklist 勾选 =====
     function toggleCheck(el) {
       el.classList.toggle('checked');
@@ -427,7 +473,6 @@
       badge.classList.add('show');
       setTimeout(() => badge.classList.remove('show'), 2000);
     }
-    // 定时刷新：每25秒显示一次
     setTimeout(showAutosave, 3000);
     setInterval(showAutosave, 25000);
 
@@ -437,7 +482,6 @@
       if (risks.find(r => r.id === id)) return;
       risks.push({ id, icon, title, desc, resolved: false });
       renderRisks();
-      // 展开风险卡片
       document.getElementById('acc-risk').classList.add('open');
     }
     function resolveRisk(id) {
@@ -451,7 +495,6 @@
       const activeCount = risks.filter(r => !r.resolved).length;
       count.textContent = risks.length === 0 ? '（暂无）' : `（${activeCount} 条待处理）`;
       empty.style.display = risks.length === 0 ? 'block' : 'none';
-      // 清除旧条目
       list.querySelectorAll('.risk-item').forEach(el => el.remove());
       risks.forEach(r => {
         const el = document.createElement('div');
@@ -530,7 +573,6 @@
           <button class="btn btn-soft btn-sm flex-1">📷 上传现货</button>
         </div>
       `;
-      // 颜色切换：改变家具图片的 CSS filter
       inner.querySelectorAll('.swatch-btn').forEach(btn => {
         btn.onclick = () => {
           inner.querySelectorAll('.swatch-btn').forEach(b => b.classList.remove('active'));
@@ -540,13 +582,9 @@
           showAutosave();
         };
       });
-      // 展开家具卡片
+      // 选中家具时自动展开家具卡片
       document.getElementById('acc-furniture').classList.add('open');
     }
-
-    // 默认选中台灯
-    renderProperty('f-lamp');
-    document.getElementById('f-lamp').classList.add('selected');
 
     // ===== 点击选中家具 =====
     document.querySelectorAll('.furniture-item').forEach(item => {
@@ -606,7 +644,6 @@
         if (xPct > 0.6) {
           triggerLampWindowWarn();
         } else {
-          // 移回安全区：将风险标记为已解决
           resolveRisk('lamp-window');
           AnxinHome.toast({ type: 'success', title: '✅ 台灯已移动', msg: '位置更新成功，眩光风险已消除。', duration: 3000 });
         }
@@ -636,9 +673,7 @@
         msg: '台灯靠近窗边后，白天与自然光叠加会产生眩光，夜间光源偏向一侧。建议放在<b>床头两侧</b>。',
         duration: 2500,
       });
-      // 添加风险记录
       addRisk('lamp-window', '⚠️', '台灯靠窗 · 眩光风险', '台灯移至窗边，白天自然光叠加会产生眩光，建议移回床头两侧。');
-      // 画布角标
       const badge = document.createElement('div');
       badge.className = 'tip-badge'; badge.id = 'lamp-badge';
       badge.style.top = '12%'; badge.style.right = '28%';
@@ -684,14 +719,12 @@
       });
     }
 
-    // 完成这间按钮已移除，checklist通过右侧折叠卡片直接访问
-
-    // ===== 返回全屋 → global-design =====
+    // ===== 返回全屋 =====
     document.getElementById('back-to-overview').onclick = () => {
       window.location.href = 'global-design.html';
     };
 
-    // ===== 对话脚本 =====
+    // ===== 对话脚本（展开对话区时才启动） =====
     const script = window.AnxinChatScripts.bedroom;
     let idx = 0;
     async function playNext() {
@@ -717,7 +750,7 @@
         });
       }
     }
-    setTimeout(playNext, 500);
+    // 注意：playNext 不在页面加载时调用，改由 toggleChatAcc() 首次展开时触发
 
     // ===== 对话框发送 =====
     document.getElementById('chat-send').onclick = () => {
