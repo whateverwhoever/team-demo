@@ -234,31 +234,39 @@
     .ci-title { font-weight: 600; color: var(--color-deep); margin-bottom: 2px; }
     .ci-desc  { color: var(--color-mute); line-height: 1.4; }
 
-    /* AI 对话区 */
-    .chat-section {
-      display: flex; flex-direction: column;
-      flex: 1; min-height: 0; overflow: hidden;
+
+    /* ===== AI 对话区折叠 ===== */
+    .chat-accordion {
       border-top: 1px solid var(--color-line);
+      display: flex; flex-direction: column;
+      flex: 1; min-height: 0;
+      overflow: hidden;
     }
-    .chat-section-header {
+    .chat-accordion-header {
       display: flex; align-items: center; justify-content: space-between;
       padding: 8px 14px; cursor: pointer; user-select: none;
       font-size: 12px; font-weight: 600; color: var(--color-deep);
-      flex-shrink: 0; transition: background 0.15s;
-      border-bottom: 1px solid var(--color-line);
+      transition: background 0.15s; flex-shrink: 0;
     }
-    .chat-section-header:hover { background: var(--color-surface-2); }
-    .chat-section-header .acc-icon { font-size: 15px; transition: transform 0.25s; }
-    .chat-section.open .chat-section-header .acc-icon { transform: rotate(180deg); }
-    .chat-section-body {
-      display: none;
-      flex-direction: column;
+    .chat-accordion-header:hover { background: var(--color-surface-2); }
+    .chat-accordion-header .acc-icon { font-size: 15px; transition: transform 0.25s; }
+    .chat-accordion.open .chat-accordion-header .acc-icon { transform: rotate(180deg); }
+    .chat-accordion-body {
+      display: flex; flex-direction: column;
       flex: 1; min-height: 0;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.35s ease;
     }
-    .chat-section.open .chat-section-body { display: flex; }
+    .chat-accordion.open .chat-accordion-body {
+      max-height: 400px;
+    }
+
+    /* AI 对话流 */
     .chat-stream-wrap {
       flex: 1; overflow-y: auto; padding: 8px 16px;
       min-height: 0;
+      max-height: 1450px;
 
     }
     .chat-input-wrap {
@@ -407,13 +415,13 @@
         </div><!-- /accordions-wrap -->
 
 
-        <!-- AI 对话区（默认折叠，展开后显示对话流+输入框） -->
-        <div class="chat-section" id="chat-section">
-          <div class="chat-section-header" onclick="toggleChatSection()">
-            <span>🤖 AI 助手对话</span>
+        <!-- AI 对话区：可折叠，默认收起 -->
+        <div class="chat-accordion" id="chat-accordion">
+          <div class="chat-accordion-header" id="chat-accordion-header" onclick="toggleChatAcc()">
+            <span>🤖 AI 对话助手</span>
             <span class="acc-icon">▾</span>
           </div>
-          <div class="chat-section-body">
+          <div class="chat-accordion-body" id="chat-accordion-body">
 
             <div class="chat-stream-wrap">
               <div class="chat-stream" id="chat"></div>
@@ -445,9 +453,16 @@
     }
 
 
-    // ===== AI对话区折叠 =====
-    function toggleChatSection() {
-      document.getElementById('chat-section').classList.toggle('open');
+    // ===== AI 对话区折叠 =====
+    let chatScriptStarted = false;
+    function toggleChatAcc() {
+      const acc = document.getElementById('chat-accordion');
+      acc.classList.toggle('open');
+      // 第一次展开时启动对话脚本
+      if (acc.classList.contains('open') && !chatScriptStarted) {
+        chatScriptStarted = true;
+        setTimeout(playNext, 400);
+      }
 
     }
 
@@ -640,12 +655,8 @@
           }
         } else {
 
-          // 移回安全区：只有之前在风险区才提示消除
-          if (lampInRisk) {
-            lampInRisk = false;
-            resolveRisk('lamp-window');
-            AnxinHome.toast({ type: 'success', title: '✅ 台灯已移动', msg: '位置更新成功，眩光风险已消除。', duration: 2500 });
-          }
+          resolveRisk('lamp-window');
+          AnxinHome.toast({ type: 'success', title: '✅ 台灯已移动', msg: '位置更新成功，眩光风险已消除。', duration: 3000 });
 
         }
       }
