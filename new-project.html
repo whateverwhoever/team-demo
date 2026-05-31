@@ -119,19 +119,19 @@
       <div class="stepper-card">
         <!-- STEP 1 -->
         <div class="step-content active" data-step="1">
-          <h2 style="margin:0 0 6px;color:var(--color-deep);font-size:22px;">你想做什么类型的装修?</h2>
-          <p class="muted" style="margin:0;">不同类型流程略有不同,选错了也能随时切换。</p>
+          <h2 style="margin:0 0 6px;color:var(--color-deep);font-size:22px;">你想做什么类型的装修？</h2>
+          <p class="muted" style="margin:0;">不同类型流程略有不同，选错了也能随时切换。</p>
 
           <div class="choice-grid">
             <div class="choice-card" data-value="full">
               <div class="ico">🏠</div>
               <div class="title">全屋装修</div>
-              <div class="desc">毛坯房 / 整套重装,从 0 到 1 出方案。AI 会陪你走完建模 → 整体设计 → 局部微调 → 成品 4 步。</div>
+              <div class="desc">毛坯房 / 整套重装，从 0 到 1 出方案。AI 会陪你走完建模 → 整体设计 → 局部微调 → 成品 4 步。</div>
             </div>
             <div class="choice-card" data-value="partial">
               <div class="ico">🛠️</div>
               <div class="title">局部改造</div>
-              <div class="desc">某一间房翻新,如书房改儿童房、阳台改茶室。需要扫描房间现状或上传照片。</div>
+              <div class="desc">某一间房翻新，如书房改儿童房、阳台改茶室。需要扫描房间现状或上传照片。</div>
             </div>
           </div>
 
@@ -143,8 +143,8 @@
 
         <!-- STEP 2 -->
         <div class="step-content" data-step="2">
-          <h2 style="margin:0 0 6px;color:var(--color-deep);font-size:22px;">你更想要哪种体验?</h2>
-          <p class="muted" style="margin:0;">没经验也别紧张,小白模式会更多卡片引导。</p>
+          <h2 style="margin:0 0 6px;color:var(--color-deep);font-size:22px;">你更想要哪种体验？</h2>
+          <p class="muted" style="margin:0;">没经验也别紧张，小白模式会有更多卡片引导。</p>
 
           <div class="choice-grid">
             <div class="choice-card selected" data-value="novice">
@@ -155,7 +155,7 @@
             <div class="choice-card" data-value="pro">
               <div class="ico">⚡</div>
               <div class="title">专业模式</div>
-              <div class="desc">假设你已有装修经验,跳过新手引导,提供更高精度的方案 + 自由编辑。</div>
+              <div class="desc">如果你已有装修经验，可跳过新手引导。提供更高精度的方案 + 自由编辑。</div>
             </div>
           </div>
 
@@ -172,12 +172,12 @@
 
           <div class="upload-zone" id="upload-zone">
             <div id="step3-upload-icon" style="font-size:48px;color:var(--color-primary);margin-bottom:10px;">⬆</div>
-            <div style="font-weight:600;color:var(--color-deep);margin-bottom:4px;" id="step3-upload-text">拖拽户型图到这里,或点击上传</div>
+            <div style="font-weight:600;color:var(--color-deep);margin-bottom:4px;" id="step3-upload-text">拖拽户型图到这里，或点击上传</div>
             <div class="tiny muted" id="step3-upload-hint">支持 JPG / PNG / PDF · 单个文件 ≤ 10MB</div>
           </div>
 
           <div class="center">
-            <span class="demo-link" id="use-demo">没有户型图?使用 demo 户型一键体验 →</span>
+            <span class="demo-link" id="use-demo">没有户型图？使用 demo 户型一键体验 →</span>
           </div>
 
           <div class="divider"></div>
@@ -186,7 +186,7 @@
             <div style="font-size:22px;">💡</div>
             <div>
               <div style="font-weight:600;color:var(--color-deep);font-size:13px;margin-bottom:4px;">小贴士</div>
-              <div class="tiny muted" id="step3-tip">户型图识别约 80% 准确率,3D 建模后会让你<b>手动确认</b>每个房间标签,识别错了一键就能改。</div>
+              <div class="tiny muted" id="step3-tip">户型图识别约 80% 准确率，3D 建模后会让你<b>手动确认</b>每个房间标签，识别错了一键就能改。</div>
             </div>
           </div>
 
@@ -263,7 +263,7 @@
       zone.classList.remove('has-file');
       zone.innerHTML = `
         <div style="font-size:48px;color:var(--color-primary);margin-bottom:10px;">${isPartial ? '📷' : '⬆'}</div>
-        <div style="font-weight:600;color:var(--color-deep);margin-bottom:4px;">${isPartial ? '拖拽房间照片到这里,或点击上传' : '拖拽户型图到这里,或点击上传'}</div>
+        <div style="font-weight:600;color:var(--color-deep);margin-bottom:4px;">${isPartial ? '拖拽房间照片到这里，或点击上传' : '拖拽户型图到这里，或点击上传'}</div>
         <div class="tiny muted">${isPartial ? '支持多角度照片 · 建议光线充足' : '支持 JPG / PNG / PDF · 单个文件 ≤ 10MB'}</div>
       `;
     }
@@ -277,9 +277,9 @@
       zone.innerHTML = isPartial
         ? `<div style="font-size:36px;color:var(--color-success);margin-bottom:10px;">✓</div>
            <div style="font-weight:600;color:var(--color-deep);">已加载 demo 主卧扫描数据</div>
-           <div class="tiny muted">12.5㎡ · 已识别:双人床、大衣柜、床头柜、梳妆台</div>`
+           <div class="tiny muted">12.5㎡ · 已识别：双人床、大衣柜、床头柜、梳妆台</div>`
         : `<div style="font-size:36px;color:var(--color-success);margin-bottom:10px;">✓</div>
-           <div style="font-weight:600;color:var(--color-deep);">已加载 demo 户型:朝阳·首开 96㎡</div>
+           <div style="font-weight:600;color:var(--color-deep);">已加载 demo 户型：朝阳·首开 96㎡</div>
            <div class="tiny muted">3 室 1 厅 1 卫 · JPG 格式</div>`;
       AnxinHome.toast({ type: 'success', title: isPartial ? 'Demo 主卧加载完成' : 'Demo 户型加载完成', msg: isPartial ? '已识别 4 件现有家具,点击「开始设计」进入建模。' : '点击「开始设计」进入建模阶段。' });
     };
