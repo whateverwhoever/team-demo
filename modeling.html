@@ -150,6 +150,28 @@
       object-fit: contain;
       display: block;
     }
+
+    /* ===== 输入框（仿 refinement） ===== */
+    .chat-input-wrap {
+      padding: 10px 16px 14px;
+      border-top: 1px solid var(--color-line);
+      flex-shrink: 0;
+    }
+    .chat-input-wrap .chat-input {
+      display: flex;
+      gap: 8px;
+    }
+    .chat-input-wrap input {
+      flex: 1;
+      border: 1px solid var(--color-line);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      outline: none;
+      background: var(--color-surface-2);
+      font-family: inherit;
+    }
+    .chat-input-wrap input:focus { border-color: var(--color-primary); }
   </style>
 </head>
 <body>
@@ -209,6 +231,13 @@
           <span class="tag tag-primary" style="margin-left:auto;">小白模式</span>
         </div>
         <div class="chat-stream" id="chat"></div>
+
+        <div class="chat-input-wrap">
+          <div class="chat-input">
+            <input id="chat-input" placeholder="告诉我你的想法，比如厨房太窄……" />
+            <button class="chat-send" id="chat-send">▶</button>
+          </div>
+        </div>
       </aside>
     </div>
   </div>
@@ -375,6 +404,18 @@
     }
 
     setTimeout(playNext, 400);
+
+    // ===== 对话框发送 =====
+    document.getElementById('chat-send').onclick = () => {
+      const v = document.getElementById('chat-input').value.trim();
+      if (!v) return;
+      AnxinHome.appendBubble(chat, { role: 'user', html: v });
+      document.getElementById('chat-input').value = '';
+      chat.scrollTop = chat.scrollHeight;
+    };
+    document.getElementById('chat-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('chat-send').click();
+    });
 
     // 移除原SVG房间点击逻辑（图片无房间DOM元素）
   </script>
